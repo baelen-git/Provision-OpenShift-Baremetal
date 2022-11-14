@@ -1,0 +1,19 @@
+ClassId: server.ProfileTemplate
+Name: OCP-BM
+Organization: default
+#settings
+TargetPlatform: Standalone
+Type: instance
+PolicyBucket:
+  - MoRef:AdapterConfigPolicyRelationship[enablePOandLLDP]
+  - MoRef:BiosPolicyRelationship[OCP]
+  - MoRef:BootPrecisionPolicyRelationship[M.2-vMedia]
+  - MoRef:DeviceconnectorPolicyRelationship[IntersightOnly]
+  - MoRef:IpmioverlanPolicyRelationship[DisableIPMI]
+  - MoRef:KvmPolicyRelationship[AllowTunneledKVM]
+  - MoRef:NtpPolicyRelationship[US.pool.ntp.org-NewYork]
+  - MoRef:SmtpPolicyRelationship[CiscoSMTP]
+  - MoRef:SolPolicyRelationship[EnableSOL]
+  - MoRef:SshPolicyRelationship[enableSSH]
+  - MoRef:StorageStoragePolicyRelationship[M.2_Raid1_and_JBOD]
+  - MoRef:VnicLanConnectivityPolicyRelationship[Dual-vNICs]

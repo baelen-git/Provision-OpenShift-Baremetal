@@ -1,0 +1,127 @@
+---
+ClassId: storage.StoragePolicy
+Name: M.2_Raid1_and_JBOD
+Organization: default
+M2VirtualDrive:
+  ClassId: storage.M2VirtualDriveConfig
+  ObjectType: storage.M2VirtualDriveConfig
+  Enable: true
+  ControllerSlot: MSTOR-RAID-1
+UnusedDisksState: Jbod
+---
+ClassId: adapter.ConfigPolicy
+Name: enablePOandLLDP
+Organization: default
+Settings:
+- ClassId: adapter.AdapterConfig
+  SlotId: MLOM
+---
+ClassId: vnic.EthNetworkPolicy
+Name: TrunkMode
+Organization: default
+VlanSettings:
+  ClassId: vnic.VlanSettings
+  ObjectType: vnic.VlanSettings
+  AllowedVlans: ""
+  DefaultVlan: 0
+  Mode: TRUNK
+---
+ClassId: vnic.EthIf
+Name: eth0
+EthAdapterPolicy: MoRef[Linux]
+EthNetworkPolicy: MoRef[TrunkMode]
+EthQosPolicy: MoRef[noQOS]
+LanConnectivityPolicy: MoRef[Dual-vNICs]
+Order: 0
+Placement:
+  ClassId: vnic.PlacementSettings
+  ObjectType: vnic.PlacementSettings
+  Id: MLOM
+  PciLink: 0
+  Uplink: 0
+---
+ClassId: vnic.EthIf
+Name: eth1
+EthAdapterPolicy: MoRef[Linux]
+EthNetworkPolicy: MoRef[TrunkMode]
+EthQosPolicy: MoRef[noQOS]
+LanConnectivityPolicy: MoRef[Dual-vNICs]
+Order: 1
+Placement:
+  ClassId: vnic.PlacementSettings
+  ObjectType: vnic.PlacementSettings
+  Id: MLOM
+  PciLink: 0
+  Uplink: 1
+---
+ClassId: boot.PrecisionPolicy
+Name: M.2-vMedia
+Organization: default
+BootDevices:
+- Bootloader:
+  ObjectType: boot.LocalDisk
+  Enabled: true
+  Name: M2
+  Slot: MSTOR-RAID
+- ObjectType: boot.VirtualMedia
+  Enabled: false
+  Name: CIMC-DVD
+  Subtype: cimc-mapped-dvd
+---
+ClassId: ntp.Policy
+Name: US.pool.ntp.org-NewYork
+Organization: default
+Enabled: true
+NtpServers:
+- us.pool.ntp.org
+Timezone: America/New_York
+---
+ClassId: smtp.Policy
+Name: CiscoSMTP
+Organization: default
+Enabled: true
+MinSeverity: critical
+SenderEmail: cimc@cisco.com
+SmtpRecipients:
+- baelen@cisco.com
+SmtpServer: mail.cisco.com
+---
+ClassId: ipmioverlan.Policy
+Name: DisableIPMI
+Organization: default
+Enabled: false
+---
+ClassId: kvm.Policy
+Name: AllowTunneledKVM
+Organization: default
+TunneledKvmEnabled: true
+---
+ClassId: deviceconnector.Policy
+Name: IntersightOnly
+Organization: default
+LockoutEnabled: false
+---
+ClassId: bios.Policy
+Name: OCP
+Organization: default
+#settings are empty because the defaults suffice.
+---
+ClassId: vnic.LanConnectivityPolicy
+Name: Dual-vNICs
+Organization: default
+#settings are empty because the defaults suffice.
+---
+ClassId: vnic.EthQosPolicy
+Name: noQOS
+Organization: default
+#settings are empty because the defaults suffice.
+---
+ClassId: sol.Policy
+Name: EnableSOL
+Organization: default
+#settings are empty because the defaults suffice.
+---
+ClassId: ssh.Policy
+Name: enableSSH
+Organization: default
+#settings are empty because the defaults suffice.
