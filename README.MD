@@ -7,7 +7,7 @@ This repository will hold everything you need to setup the Intersight workflow t
 3. Intersight premier licenses (90 day trail avaialble)
 4. Server Profile Template (example provided)
 5. Linux server to host the generated ISO (AWS free tier will suffice)
-6. (optional) pre-create the DNS entries included the PTr 
+6. (optional) create the DNS entries included the PTR records for reverse DNS lookup.
 
 # Steps
 1. Create your Policies and Profiles.<br>
