@@ -1,6 +1,8 @@
 # Description
 This repository will hold everything you need to setup the Intersight workflow to provision OpenShift baremetal clusters. 
 
+![image](https://user-images.githubusercontent.com/11138110/201940706-16c3a0a2-6cea-44d8-b7dc-1d1573851842.png)
+
 # Pre requistes
 1. An Intersight account
 2. 3 or more UCS servers claimed into intersight
