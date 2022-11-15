@@ -1,7 +1,7 @@
 # Description
 This repository will hold everything you need to setup the Intersight workflow to provision OpenShift baremetal clusters. 
 
-![image](https://user-images.githubusercontent.com/11138110/201940706-16c3a0a2-6cea-44d8-b7dc-1d1573851842.png)
+![Provision OpenShift BM workflow](https://user-images.githubusercontent.com/11138110/201941372-92b1b8af-e611-4b8d-b5f2-acbade6fa00a.jpg)
 
 # Pre requistes
 1. An Intersight account
