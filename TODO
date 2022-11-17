@@ -5,6 +5,9 @@ Blockers:
 
 Todo:
 - Test bonding
+- Fix the missing SERVER mapping for get MAC task on import
+- Add validation to see if you have provided enough IPS for the MAC list
+- automatically get the NIC and Adapter names from the SPT. 
 - Failover Tests
 - Proxy Support
 - Only show servers which are unassigned
@@ -14,7 +17,7 @@ Todo:
 - Validation if the SPT doesnt have any vmedia policies mounted at the moment.
 - Validation on all tasks of the result is what we expected.
 - Configure the Uplink switch correctly.
-- automatically get the NIC names from the SPT. 
+
 
 DONE
 - Accomodate for longer waits then 15 minutes in the install workflow 
