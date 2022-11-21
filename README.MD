@@ -13,7 +13,7 @@ This repository will hold everything you need to setup the Intersight workflow t
 
 # Steps
 1. Create your Policies and Profiles.<br>
-Please following the instuctions in [the example directory](examples/README.md) to load the provided example.
+Please following the instuctions in [the example directory](examples/README.MD) to load the provided example.
 2. Import the workflow
 3. Login to your Linux server and run the docker container
 ``` 
@@ -29,6 +29,7 @@ Open the workflow and go to Designer -> Get MAC Address.
     1. Go to Inputs and under "Servers" click on Edit Mapping 
     2. Select Direct Mapping -> Workflow Input -> Servers
     3. leave Array Index empty
+7. Execute the workflow.
     
 # Validated Setup
 UCS C220-M5 Rackmount with 2x M.2 drives

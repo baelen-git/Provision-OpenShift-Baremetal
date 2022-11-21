@@ -1,23 +1,17 @@
-Blockers:
-- Boot directly from the signed URL
-- Use IP Pool. 
-- use bulk/MoMergers API in ICO  https://jira-eng-sjc11.cisco.com/jira/browse/ISICO-14125
-
 Todo:
-- Test bonding
+- Fix bonding
 - Fix the missing SERVER mapping for get MAC task on import
 - Add validation to see if you have provided enough IPS for the MAC list
 - automatically get the NIC and Adapter names from the SPT. 
-- Failover Tests
 - Proxy Support
 - Only show servers which are unassigned
 - Use Server Pool
+- Failover Tests
 - Create Roll Back Task
 - Create DNS entries 
 - Validation if the SPT doesnt have any vmedia policies mounted at the moment.
 - Validation on all tasks of the result is what we expected.
 - Configure the Uplink switch correctly.
-
 
 DONE
 - Accomodate for longer waits then 15 minutes in the install workflow 
@@ -25,3 +19,8 @@ DONE
 - Provide an example SPT through isctl
 - Input validation
 - Be able to select the OpenShift version
+
+Blockers:
+- Boot directly from the signed URL
+- Use IP Pool. 
+- use bulk/MoMergers API in ICO  https://jira-eng-sjc11.cisco.com/jira/browse/ISICO-14125
