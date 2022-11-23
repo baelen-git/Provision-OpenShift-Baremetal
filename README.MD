@@ -3,7 +3,7 @@ This repository will hold everything you need to setup the Intersight workflow t
 
 ![Provision OpenShift BM workflow](https://user-images.githubusercontent.com/11138110/201941372-92b1b8af-e611-4b8d-b5f2-acbade6fa00a.jpg)
 
-# Pre requistes
+# Pre-requisites
 1. An Intersight account
 2. 3 or more UCS servers claimed into intersight
 3. Intersight premier licenses (90 day trail avaialble)
