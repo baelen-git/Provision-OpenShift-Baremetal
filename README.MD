@@ -18,7 +18,14 @@ Please following the instuctions in [the example directory](examples/README.MD) 
 ``` 
 docker run -d -p 80:80 baelen/iso-host
 ```
-3. Claim the ISO Host in Intersight as a HTTP target
+3. Claim the ISO Host in Intersight as a HTTP target.<br>
+Under Targets click on Claim
+    1. Select the HTTP endpoint and click next
+    2. If you require an Intersight Assist to connect to your apache server select it first.
+    3. Enter the Name, Hostname for your apache server
+    4. Use Port 80
+    5. No Authentication is required.
+    6. No HTTPS needs to be enabled.
 4. Import the workflow. After importing the workflow should show as invalid.
 5. Modify the workflow to use the ISO Host target. <br>
 Open the workflow and go to General -> Workflow Variables.
