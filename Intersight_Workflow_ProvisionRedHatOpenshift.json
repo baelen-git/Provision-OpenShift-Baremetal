@@ -1,0 +1,4273 @@
+[
+  {
+    "Body": {
+      "ClassId": "workflow.TaskDefinition",
+      "DefaultVersion": true,
+      "Description": "Get's a JWT from Red Hat which you can use for 15 minutes",
+      "Label": "Get Red Hat JWT",
+      "Name": "GetRedHatJWT",
+      "ObjectType": "workflow.TaskDefinition",
+      "Properties": {
+        "ExternalMeta": true,
+        "InputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Offline Token",
+            "Name": "OFFLINE_TOKEN",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "CustomDataTypeProperties": {
+              "CatalogMoid": "shared",
+              "ObjectType": "workflow.CustomDataProperty"
+            },
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Redhat SSO Endpoint",
+            "Name": "Target",
+            "ObjectType": "workflow.TargetDataType",
+            "Properties": [
+              {
+                "DisplayAttributes": [
+                  "Name",
+                  "TargetType"
+                ],
+                "ObjectType": "workflow.TargetProperty",
+                "Selector": "/api/v1/asset/Targets?$filter=((TargetType eq HTTPEndpoint and Status eq Claimed) or ((TargetType eq PureStorageFlashArray or TargetType eq HitachiVirtualStoragePlatform or TargetType eq NetAppActiveIqUnifiedManager or TargetType eq TerraformCloud or TargetType eq VmwareVcenter or TargetType eq APIC or TargetType eq MDSDevice or TargetType eq NexusDevice or TargetType eq UCSD) and Status eq Connected))",
+                "SelectorProperty": {
+                  "Method": "GET",
+                  "ObjectType": "workflow.SelectorProperty"
+                },
+                "SupportedObjects": [
+                  "asset.Target"
+                ]
+              }
+            ],
+            "Required": true
+          }
+        ],
+        "ObjectType": "workflow.Properties",
+        "OutputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The list of output parameters extracted from the response.\n",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Java Web Token",
+            "Name": "JWT",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Secure": true,
+              "Type": "string"
+            }
+          }
+        ],
+        "RetryCount": 3,
+        "RetryDelay": 60,
+        "RetryPolicy": "Fixed",
+        "SupportStatus": "Supported",
+        "Timeout": 600,
+        "TimeoutPolicy": "Timeout"
+      },
+      "RollbackTasks": [],
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/TaskDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.WorkflowDefinition",
+      "DefaultVersion": true,
+      "Description": "This Workflow will\n1. Create Red Hat and OpenShift Targets\n2. Create an OpenShift cluster in Red Hat's Hybrid Cloud Console and get the custom generated ISO",
+      "InputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "You can get your Token from https://console.redhat.com/openshift/token/show",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Redhat API Token",
+          "Name": "OFFLINE_TOKEN",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The name of the Openshift Cluster you want to create",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Cluster name",
+          "Name": "CLUSTER_NAME",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 54,
+              "Min": 1,
+              "ObjectType": "workflow.Constraints",
+              "Regex": "^[a-z-]?[a-z-0-9\\-\\.]+[a-z-]?$"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The domain name that is used for the Openshift Cluster",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Base domain",
+          "Name": "DOMAIN_NAME",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 63,
+              "Min": 3,
+              "ObjectType": "workflow.Constraints",
+              "Regex": "^[a-z-]*\\.[a-z-]*$"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "4.11"
+          },
+          "Description": "The version of OpenShift you would like to install",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "OpenShift version",
+          "Name": "VERSION",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [
+                {
+                  "Label": "4.12 - Developer Preview Release",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.12"
+                },
+                {
+                  "Label": "4.11",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.11"
+                },
+                {
+                  "Label": "4.10",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.10"
+                },
+                {
+                  "Label": "4.9",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.9"
+                }
+              ],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "enum"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Your public key that will be added to the hosts for the 'core' user",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "SSH public key",
+          "Name": "SSH_PUB_KEY",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Additional NTP servers to use. Leave empty to use default RHCOS internet NTP servers",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "NTP servers",
+          "Name": "NTP_SERVERS",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "enable this specify static IP, VLAN or bonding. Leave empty for DHCP",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Static IP",
+          "Name": "STATIC",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "boolean"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The VLAN ID to use. Leave empty for no VLAN configuration",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "VLAN ID",
+          "Name": "VLAN_ID",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 4096,
+              "Min": 1,
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "integer"
+          }
+        },
+        {
+          "ArrayItemType": {
+            "ObjectType": "workflow.PrimitiveArrayItem",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            }
+          },
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": [
+              "eth0",
+              "eth1"
+            ]
+          },
+          "Description": "When creating a bond please add multiple NIC's using the plus sign",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "NIC - add 2 or more to create a bond",
+          "Max": 4,
+          "Min": 1,
+          "Name": "NIC",
+          "ObjectType": "workflow.ArrayDataType",
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "active-backup"
+          },
+          "Description": "The mode in which you would like to bond the NICs. Please check here for more details https://docs.openshift.com/container-platform/4.9/networking/k8s_nmstate/k8s-nmstate-updating-node-network-config.html#virt-example-bond-nncp_k8s_nmstate-updating-node-network-config",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Link aggregation mode - only required for bonding",
+          "Name": "BOND_MODE",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [
+                {
+                  "Label": "active-backup",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "active-backup"
+                },
+                {
+                  "Label": "balance-xor",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "balance-xor"
+                },
+                {
+                  "Label": "802.3ad - LACP",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "802.3ad"
+                },
+                {
+                  "Label": "balance-tlb",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "balance-tlb"
+                },
+                {
+                  "Label": "balance-alb",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "balance-alb"
+                }
+              ],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "enum"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Length of your network prefix. For example 24",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Network Prefix Length",
+          "Name": "PREFIX_LENGTH",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 32,
+              "Min": 1,
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "integer"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "DNS Server is used to get the hostnames of your hosts with a reverse IP lookup.",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "DNS",
+          "Name": "DNS_SERVER",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Your gateway to Valhalla",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Gateway",
+          "Name": "GATEWAY",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "ArrayItemType": {
+            "ObjectType": "workflow.CustomArrayItem",
+            "Properties": {
+              "CatalogMoid": "shared",
+              "CustomDataTypeName": "IpV4AddressType",
+              "ObjectType": "workflow.CustomDataProperty"
+            }
+          },
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "List of IP's to use for the OpenShift servers. Click the plus sign to add more.",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "IP Addresses",
+          "Max": 16,
+          "Min": 1,
+          "Name": "IPS",
+          "ObjectType": "workflow.ArrayDataType",
+          "Required": true
+        },
+        {
+          "ArrayItemType": {
+            "ObjectType": "workflow.PrimitiveArrayItem",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            }
+          },
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "A list of the MAC Addresses of the servers",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "MAC Address List",
+          "Max": 16,
+          "Min": 1,
+          "Name": "MAC_ADDRESS",
+          "ObjectType": "workflow.ArrayDataType",
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The IP Address that will be assigned to the Kubernetes API",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "API IP Address",
+          "Name": "API_IP",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The IP Address that will be assigned to the ingress gateway",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Ingress IP Address",
+          "Name": "INGRESS_IP",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "10.128.0.0/14"
+          },
+          "Description": "The CIDR used for the POD network",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "POD CIDR",
+          "Name": "POD_CIDR",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "172.30.0.0/16"
+          },
+          "Description": "The CIDR used for the service network",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Service CIDR",
+          "Name": "SERVICE_CIDR",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Run virtual machines alongside containers on one platform. Additional Requirements      Enabled CPU virtualization support in BIOS (Intel-VT / AMD-V) on all nodes     Each worker node requires an additional 360 MiB of memory and 2 CPUs     Each control plane node requires an additional 150 MiB of memory and 4 CPUs     OpenShift Data Foundation (recommended for full functionality) or another persistent storage service",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Install OpenShift Virtualization",
+          "Name": "OSV",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "boolean"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Persistent software-defined storage for hybrid applications. ",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Install OpenShift Data Foundation",
+          "Name": "ODF",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "boolean"
+          }
+        }
+      ],
+      "InputParameterSet": [
+        {
+          "Condition": "eq",
+          "ControlParameter": "STATIC",
+          "EnableParameters": [
+            "VLAN_ID",
+            "NIC",
+            "BOND_MODE",
+            "PREFIX_LENGTH",
+            "GATEWAY",
+            "DNS_SERVER",
+            "IPS",
+            "MAC_ADDRESS"
+          ],
+          "Name": "STATIC",
+          "ObjectType": "workflow.ParameterSet",
+          "Value": "true"
+        }
+      ],
+      "Label": "Create OpenShift Cluster",
+      "Name": "CreateOpenshiftBMCluster",
+      "ObjectType": "workflow.WorkflowDefinition",
+      "OutputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The URL to the ISO provided by Red Hat",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "ISO_URL",
+          "Name": "ISO_URL",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The ID of the Cluster",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Cluster ID",
+          "Name": "CLUSTER_ID",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          }
+        }
+      ],
+      "OutputParameters": {
+        "CLUSTER_ID": "${createOpenshiftCluster.output.Parameters.CLUSTER_ID}",
+        "ISO_URL": "${InvokeGenericWebApi1.output.Parameters.ISO_URL}"
+      },
+      "Properties": {
+        "EnableDebug": true,
+        "ExternalMeta": true,
+        "ObjectType": "workflow.WorkflowProperties",
+        "SupportStatus": "Supported"
+      },
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Tasks": [
+        {
+          "Name": "StartTask",
+          "NextTask": "RHTarget",
+          "ObjectType": "workflow.StartTask"
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.'h",
+          "InputParameters": {
+            "ContentType": "json",
+            "Headers": {
+              "Accept": "application/json, text/plain, */*"
+            },
+            "Method": "POST",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "RH_TOKEN",
+                  "Path": "$",
+                  "Type": "json"
+                }
+              ]
+            },
+            "Target": "${OpenshiftTarget.output.Target}",
+            "Url": "/api/accounts_mgmt/v1/access_token"
+          },
+          "Label": "Get Access Tokens",
+          "Name": "getAccessTokens",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "createOpenshiftCluster",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "VariableParameters": {},
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Unclaims the target endpoint from Intersight. When a target is unclaimed, it is immediately detached from the corresponding Intersight account. The target retains any configuration applied before the unclaim operation. You can unclaim any type of target endpoints. ",
+          "InputParameters": {
+            "Target": "${OpenshiftTarget.output.Target}"
+          },
+          "Label": "Remove Openshift API Target",
+          "Name": "removeOpenshiftTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "removeRHTarget",
+          "TaskDefinitionName": "RemoveTarget",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "InputParameters": {
+            "Body": {
+              "ContentType": "text",
+              "Text": "{\n  \"name\": \"{{.global.workflow.input.CLUSTER_NAME}}\",\n  \"high_availability_mode\": \"Full\",\n  \"openshift_version\": \"{{.global.workflow.input.VERSION}}\",\n  \"pull_secret\": \"{{.global.getAccessTokens.output.Parameters.RH_TOKEN | ToJson | js | js}}\",\n  \"base_dns_domain\": \"{{.global.workflow.input.DOMAIN_NAME}}\",\n  \"cpu_architecture\": \"x86_64\",\n  \"disk_encryption\": {\n    \"mode\": \"tpmv2\",\n    \"enable_on\": \"none\"\n  },\n  \"network_type\": \"OpenShiftSDN\",\n  \"api_vip\": \"{{.global.workflow.input.API_IP}}\",\n  \"ingress_vip\": \"{{.global.workflow.input.INGRESS_IP}}\",\n  \"ssh_public_key\": \"{{.global.workflow.input.SSH_PUB_KEY}}\",\n  \"vip_dhcp_allocation\": false,\n{{- if .global.workflow.input.STATIC }}\n  \"machine_networks\": [{ \"cidr\": \"{{.global.workflow.input.GATEWAY}}/{{.global.workflow.input.PREFIX_LENGTH }}\" }],\n{{- end}}\n  \"cluster_networks\": [{ \"cidr\": \"{{.global.workflow.input.POD_CIDR}}\", \"host_prefix\": 23 }],\n  \"service_networks\": [{ \"cidr\": \"{{.global.workflow.input.SERVICE_CIDR}}\" }],\n  \"olm_operators\":[{{ if .global.workflow.input.OSV }}{\"name\":\"cnv\"}{{end}}{{ if and .global.workflow.input.ODF .global.workflow.input.OSV }},{{end}}{{if .global.workflow.input.ODF }}{\"name\":\"ocs\"}{{end}}]\n}"
+            },
+            "ContentType": "json",
+            "Headers": {
+              "Content-Type": "application/json",
+              "accept": "application/json"
+            },
+            "Method": "POST",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "CLUSTER_ID",
+                  "Path": "$.id",
+                  "Type": "string"
+                }
+              ]
+            },
+            "Target": "${OpenshiftTarget.output.Target}",
+            "Url": "/api/assisted-install/v2/clusters/"
+          },
+          "Label": "Create Openshift Cluster",
+          "Name": "createOpenshiftCluster",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "createInfraEnv",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Claims a new target endpoint in Intersight. The supported target types are HTTP , SSH, Powershell and Ansible endpoint.",
+          "InputParameters": {
+            "ClaimTargetOptions": {
+              "AuthenticationRequired": false,
+              "ConnectViaAssist": false,
+              "EnableHTTPSProtocol": true,
+              "TargetType": "HTTPEndpoint"
+            },
+            "Host": "sso.redhat.com",
+            "Name": "Redhat SSO",
+            "Port": 443
+          },
+          "Label": "Add Redhat SSO Target",
+          "Name": "RHTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "GetRedHatJWT1",
+          "TaskDefinitionName": "NewTarget",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Unclaims the target endpoint from Intersight. When a target is unclaimed, it is immediately detached from the corresponding Intersight account. The target retains any configuration applied before the unclaim operation. You can unclaim any type of target endpoints. ",
+          "InputParameters": {
+            "Target": "${RHTarget.output.Target}"
+          },
+          "Label": "Remove Redhat SSO Target",
+          "Name": "removeRHTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SuccessEndTask",
+          "TaskDefinitionName": "RemoveTarget",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "InputParameters": {
+            "Body": {
+              "ContentType": "text",
+              "Text": "{\n\t\"name\": \"{{.global.workflow.input.CLUSTER_NAME}}_infra-env\",\n\t\"pull_secret\": \"{{.global.getAccessTokens.output.Parameters.RH_TOKEN | ToJson | js | js}}\",\n\t\"cluster_id\": \"{{.global.createOpenshiftCluster.output.Parameters.CLUSTER_ID}}\",\n\t\"ssh_authorized_key\": \"{{.global.workflow.input.SSH_PUB_KEY}}\",\n\t\"image_type\": \"minimal-iso\",\n\t\"openshift_version\": \"4.11\",\n\t\"cpu_architecture\": \"x86_64\"{{- if .global.workflow.input.NTP_SERVERS}},\n\t\"additional_ntp_sources\": \"{{.global.workflow.input.NTP_SERVERS }}\"{{- end}}\n\t{{- if .global.workflow.input.STATIC}},\n\t\"static_network_config\": [\n\t{{- $NAME := (index .global.workflow.input.NIC 0) }}\n\t{{- $TYPE := `ethernet` }}\n\t{{- if ge (len .global.workflow.input.NIC) 2 -}}\n\t\t{{- $NAME = `bond0` -}}\n\t\t{{- $TYPE = `bond` -}}\n\t{{- else -}}\n\t\t{{- $NAME = (index .global.workflow.input.NIC 0) -}}\n\t\t{{- $TYPE = `ethernet` -}}\n\t{{- end -}}\n\t{{- $INPUT := .global.workflow.input }}\n\t{{- range $index, $mac := .global.workflow.input.MAC_ADDRESS}}\n\t{{- if $index}},{{end}}\n\t{\n\t\t\"network_yaml\": \"#Generated by Intersight\\ninterfaces:\\n  - name: {{ $NAME }}\\n    type: {{ $TYPE }}\\n    state: up\\n{{- if eq $TYPE `bond` }}    link-aggregation:\\n      mode: {{ $INPUT.BOND_MODE }}\\n      options:\\n        miimon: '140'\\n      port:\\n  {{- range $port := $INPUT.NIC }}      - {{ $port }}\\n {{- end}}{{- end}}{{- if $INPUT.VLAN_ID}}  - name: {{ $NAME }}.{{$INPUT.VLAN_ID}}\\n    type: vlan\\n    state: up\\n    vlan:\\n      base-iface: {{$NAME}}\\n      id: {{$INPUT.VLAN_ID}}\\n{{- end}}    ipv4:\\n      address:\\n        - ip: {{index $INPUT.IPS $index}}\\n          prefix-length: {{$INPUT.PREFIX_LENGTH}}\\n      enabled: true\\n      dhcp: false\\ndns-resolver:\\n  config:\\n    server:\\n      - {{$INPUT.DNS_SERVER}}\\nroutes:\\n  config:\\n    - destination: 0.0.0.0/0\\n      next-hop-address: {{$INPUT.GATEWAY}}\\n      next-hop-interface: {{$NAME}}{{if $INPUT.VLAN_ID}}.{{$INPUT.VLAN_ID}}{{end}}\\n      table-id: 254\\n\",\n\t\t\"mac_interface_map\": [\n\t\t{\n\t\t\t\"mac_address\": \"{{$mac}}\",\n\t\t\t\"logical_nic_name\": \"{{$NAME}}\"\n\t\t}\n\t\t]\n\t}\n\t{{end}}\n\t]\n\t{{end}}\n}"
+            },
+            "ContentType": "json",
+            "Headers": {
+              "Content-Type": "application/json",
+              "accept": "application/json"
+            },
+            "Method": "POST",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "INFRA_ENV_ID",
+                  "Path": "$.id",
+                  "Type": "string"
+                }
+              ]
+            },
+            "Target": "${OpenshiftTarget.output.Target}",
+            "Url": "/api/assisted-install/v2/infra-envs/"
+          },
+          "Label": "Create Infra Environment",
+          "Name": "createInfraEnv",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "InvokeGenericWebApi1",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Get's a JWT from Red Hat which you can use for 15 minutes",
+          "InputParameters": {
+            "OFFLINE_TOKEN": "${workflow.input.OFFLINE_TOKEN}",
+            "Target": "${RHTarget.output.Target}"
+          },
+          "Label": "Get Red Hat Token",
+          "Name": "GetRedHatJWT1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "OpenshiftTarget",
+          "TaskDefinitionName": "GetRedHatJWT",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "InputParameters": {
+            "Method": "GET",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "ISO_URL",
+                  "Path": "$.download_url",
+                  "Type": "string"
+                }
+              ]
+            },
+            "Target": "${OpenshiftTarget.output.Target}",
+            "Url": "/api/assisted-install/v2/infra-envs/{{.global.createInfraEnv.output.Parameters.INFRA_ENV_ID}}"
+          },
+          "Label": "Get ISO URL",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "removeOpenshiftTarget",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Claims a new target endpoint in Intersight. The supported target types are HTTP , SSH, Powershell and Ansible endpoint.",
+          "InputParameters": {
+            "ClaimTargetOptions": {
+              "AuthenticationRequired": true,
+              "ConnectViaAssist": false,
+              "EnableHTTPSProtocol": true,
+              "HTTPAuth": {
+                "AuthenticationSchemeOptions": "Bearer Token",
+                "IsTokenSet": true,
+                "Token": "{{ .global.GetRedHatJWT1.output.JWT }}"
+              },
+              "TargetType": "HTTPEndpoint"
+            },
+            "Host": "api.openshift.com",
+            "Name": "Openshift API",
+            "Port": 443
+          },
+          "Label": "Add Openshift API Target",
+          "Name": "OpenshiftTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "getAccessTokens",
+          "TaskDefinitionName": "NewTarget",
+          "Version": 1
+        },
+        {
+          "Name": "SuccessEndTask",
+          "ObjectType": "workflow.SuccessEndTask"
+        },
+        {
+          "Name": "FailureEndTask",
+          "ObjectType": "workflow.FailureEndTask"
+        }
+      ],
+      "UiInputFilters": [],
+      "UiRenderingData": {
+        "Positions": [
+          {
+            "Name": "StartTask",
+            "X": 178.99724518747269,
+            "Y": 176.19129285594187
+          },
+          {
+            "Name": "SuccessEndTask",
+            "X": 914.0911848894373,
+            "Y": 448.07996554800275
+          },
+          {
+            "Name": "FailureEndTask",
+            "X": 553.0228108778879,
+            "Y": 524.4711673186232
+          },
+          {
+            "Name": "RHTarget",
+            "X": 93.63042147131455,
+            "Y": 266.80258959218764
+          },
+          {
+            "Name": "removeRHTarget",
+            "X": 830.1614326411625,
+            "Y": 328.5280082289475
+          },
+          {
+            "Name": "removeOpenshiftTarget",
+            "X": 831.1675883914065,
+            "Y": 251.63280543748277
+          },
+          {
+            "Name": "OpenshiftTarget",
+            "X": 91.50030674415791,
+            "Y": 415.5
+          },
+          {
+            "Name": "getAccessTokens",
+            "X": 445.8559791080572,
+            "Y": 192.04037402955575
+          },
+          {
+            "Name": "createOpenshiftCluster",
+            "X": 446.0271136326817,
+            "Y": 265.2870754996965
+          },
+          {
+            "Name": "createInfraEnv",
+            "X": 445.5,
+            "Y": 336.5
+          },
+          {
+            "Name": "InvokeGenericWebApi1",
+            "X": 446.02711363268213,
+            "Y": 408.2091487973332
+          },
+          {
+            "Name": "GetRedHatJWT1",
+            "X": 92.12123261930367,
+            "Y": 346.5
+          }
+        ]
+      },
+      "VariableDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Value": "api.openshift.com"
+          },
+          "Description": "Relative URL for Intersight, Device Registration and Target APIs. Does not support specifying fully qualified URL.\n",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "openshift_api",
+          "Name": "openshift_api",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/WorkflowDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.TaskDefinition",
+      "DefaultVersion": true,
+      "Description": "Get the Profile which is associated with the server",
+      "Label": "Get Server Profile from Server",
+      "Name": "GetServerProfilefromServer",
+      "ObjectType": "workflow.TaskDefinition",
+      "Properties": {
+        "ExternalMeta": true,
+        "InputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Server",
+            "Name": "Server",
+            "ObjectType": "workflow.MoReferenceDataType",
+            "Properties": [
+              {
+                "DisplayAttributes": [
+                  "Name"
+                ],
+                "ObjectType": "workflow.MoReferenceProperty",
+                "Selector": "/api/v1/compute/PhysicalSummaries",
+                "SelectorProperty": {
+                  "Method": "GET",
+                  "ObjectType": "workflow.SelectorProperty"
+                }
+              }
+            ],
+            "Required": true
+          }
+        ],
+        "ObjectType": "workflow.Properties",
+        "OutputDefinition": [
+          {
+            "ArrayItemType": {
+              "ObjectType": "workflow.PrimitiveArrayItem",
+              "Properties": {
+                "Constraints": {
+                  "EnumList": [],
+                  "ObjectType": "workflow.Constraints"
+                },
+                "InventorySelector": [],
+                "ObjectType": "workflow.PrimitiveDataProperty",
+                "Type": "string"
+              }
+            },
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "ServerProfileMoids",
+            "Max": 9999,
+            "Name": "ServerProfileMoids",
+            "ObjectType": "workflow.ArrayDataType"
+          }
+        ],
+        "RetryCount": 3,
+        "RetryDelay": 60,
+        "RetryPolicy": "Fixed",
+        "SupportStatus": "Supported",
+        "Timeout": 600,
+        "TimeoutPolicy": "Timeout"
+      },
+      "RollbackTasks": [],
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/TaskDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.WorkflowDefinition",
+      "DefaultVersion": true,
+      "Description": "Deploy the Server Profile, Configure the one time Boot Device and Power Cycle",
+      "InputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true
+          },
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Server",
+          "Name": "Server",
+          "ObjectType": "workflow.MoReferenceDataType",
+          "Properties": [
+            {
+              "DisplayAttributes": [
+                "Name"
+              ],
+              "ObjectType": "workflow.MoReferenceProperty",
+              "Selector": "/api/v1/compute/PhysicalSummaries?$expand=RegisteredDevice($select=ConnectionStatus)&$select=RegisteredDevice,Name,PlatformType,ManagementMode,MgmtIpAddress,Serial,Firmware,UserLabel,AssetTag&$filter='ManagementMode' eq 'IntersightStandalone'",
+              "SelectorProperty": {
+                "Method": "GET",
+                "ObjectType": "workflow.SelectorProperty"
+              }
+            }
+          ],
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "CIMC-DVD"
+          },
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "One Time Boot Device",
+          "Name": "OneTimeBootDevice",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "Power Cycle"
+          },
+          "Description": "Sets Server Power state to Power On, Power Off, Power Cycle or Hard Reset.",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Desired Power State",
+          "Name": "PowerState",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [
+                {
+                  "Label": "Power On",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "Power On"
+                },
+                {
+                  "Label": "Power Off",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "Power Off"
+                },
+                {
+                  "Label": "Power Cycle",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "Power Cycle"
+                },
+                {
+                  "Label": "Hard Reset",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "Hard Reset"
+                }
+              ],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "enum"
+          },
+          "Required": true
+        }
+      ],
+      "InputParameterSet": [],
+      "Label": "Boot Server from vMedia",
+      "Name": "BootServerfromvMedia",
+      "ObjectType": "workflow.WorkflowDefinition",
+      "OutputDefinition": [],
+      "Properties": {
+        "EnableDebug": true,
+        "ExternalMeta": true,
+        "ObjectType": "workflow.WorkflowProperties",
+        "SupportStatus": "Supported"
+      },
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Tasks": [
+        {
+          "Name": "StartTask",
+          "NextTask": "GetServerProfilefromServer1",
+          "ObjectType": "workflow.StartTask"
+        },
+        {
+          "Name": "SuccessEndTask",
+          "ObjectType": "workflow.SuccessEndTask"
+        },
+        {
+          "Name": "FailureEndTask",
+          "ObjectType": "workflow.FailureEndTask"
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Configures the chosen device as the one-time boot device for the server. This device will be used when the server powers on the next time. If no device is chosen, It clears the one time boot configuration.",
+          "InputParameters": {
+            "OneTimeBootDevice": "${workflow.input.OneTimeBootDevice}",
+            "Server": "${workflow.input.Server}"
+          },
+          "Label": "Set Server One Time Boot Device",
+          "Name": "SetServerOneTimeBootDevice1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SetServerPowerState1",
+          "TaskDefinitionName": "SetServerOneTimeBootDevice",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Sets Server Power state to Power On, Power Off, Power Cycle or Hard Reset.",
+          "InputParameters": {
+            "PowerState": "${workflow.input.PowerState}",
+            "Server": "${workflow.input.Server}"
+          },
+          "Label": "Set Server Power State",
+          "Name": "SetServerPowerState1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SuccessEndTask",
+          "TaskDefinitionName": "SetServerPowerState",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Deploys the selected server profile on the server\nOn successful execution, the Deploy Server Profile workflow will be triggered.\n",
+          "InputParameters": {
+            "Profile": {
+              "Moid": "{{ index .global.GetServerProfilefromServer1.output.ServerProfileMoids 0}}",
+              "ObjectType": "server.Profile"
+            }
+          },
+          "Label": "Deploy Server Profile",
+          "Name": "DeployServerProfile1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SetServerOneTimeBootDevice1",
+          "TaskDefinitionName": "DeployServerProfile",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Get the Profile which is associated with the server",
+          "InputParameters": {
+            "Server": "${workflow.input.Server}"
+          },
+          "Label": "Get Server Profile from Server",
+          "Name": "GetServerProfilefromServer1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnSuccess": "DeployServerProfile1",
+          "TaskDefinitionName": "GetServerProfilefromServer",
+          "Version": 1
+        }
+      ],
+      "UiInputFilters": [],
+      "UiRenderingData": {
+        "Positions": [
+          {
+            "Name": "StartTask",
+            "X": 263.5,
+            "Y": 80
+          },
+          {
+            "Name": "SuccessEndTask",
+            "X": 263.5,
+            "Y": 553.3333282470703
+          },
+          {
+            "Name": "FailureEndTask",
+            "X": 406.5,
+            "Y": 553.3333282470703
+          },
+          {
+            "Name": "SetServerOneTimeBootDevice1",
+            "X": 178.5,
+            "Y": 355.16666412353516
+          },
+          {
+            "Name": "SetServerPowerState1",
+            "X": 178.5,
+            "Y": 454.24999618530273
+          },
+          {
+            "Name": "DeployServerProfile1",
+            "X": 178.5,
+            "Y": 256.0833320617676
+          },
+          {
+            "Name": "GetServerProfilefromServer1",
+            "X": 178.5,
+            "Y": 157
+          }
+        ]
+      },
+      "VariableDefinition": [],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/WorkflowDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.WorkflowDefinition",
+      "DefaultVersion": true,
+      "Description": "1. Create a new Server Profile from Template\n2. Set a server to the newly created Server Profile\n3. Deploy the Server Profile",
+      "InputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Select the Server Profile Template you would like to use",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Server Profile Template",
+          "Name": "SPT",
+          "ObjectType": "workflow.MoReferenceDataType",
+          "Properties": [
+            {
+              "DisplayAttributes": [
+                "Name",
+                "Description",
+                "TargetPlatform"
+              ],
+              "ObjectType": "workflow.MoReferenceProperty",
+              "Selector": "/api/v1/server/ProfileTemplates",
+              "SelectorProperty": {
+                "Method": "GET",
+                "ObjectType": "workflow.SelectorProperty"
+              }
+            }
+          ],
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Server to deploy the Profile Template to",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Server",
+          "Name": "SERVER",
+          "ObjectType": "workflow.MoReferenceDataType",
+          "Properties": [
+            {
+              "DisplayAttributes": [
+                "Name",
+                "Model",
+                "Serial",
+                "ManagementMode",
+                "Firmware",
+                "MgmtIpAddress"
+              ],
+              "ObjectType": "workflow.MoReferenceProperty",
+              "Selector": "/api/v1/compute/PhysicalSummaries",
+              "SelectorProperty": {
+                "Method": "GET",
+                "ObjectType": "workflow.SelectorProperty"
+              }
+            }
+          ],
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The Name of the Server Profile to create",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Server Profile Name",
+          "Name": "SP_NAME",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The Name of the NIC you want the MAC address of",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "NIC Name",
+          "Name": "NIC_NAME",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        }
+      ],
+      "InputParameterSet": [],
+      "Label": "Create and Deploy Server Profile",
+      "Name": "CreateandDeployServerProfile",
+      "ObjectType": "workflow.WorkflowDefinition",
+      "OutputDefinition": [],
+      "OutputParameters": {},
+      "Properties": {
+        "ExternalMeta": true,
+        "ObjectType": "workflow.WorkflowProperties",
+        "SupportStatus": "Supported"
+      },
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Tasks": [
+        {
+          "Name": "StartTask",
+          "NextTask": "NewServerProfileFromTemplate1",
+          "ObjectType": "workflow.StartTask"
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Creates a server profile from the selected template and adds the associated policies to the server profile.\nIf the 'Target Profile Name' is provided, it will be considered as the name of the profile to be created. The task will fail, if the profile name already exists.\nIf the 'Target Profile Name' is not provided, the name of the profile is generated from the 'Target Profile Name Prefix' and 'Target Profile Name Suffix' inputs.\n",
+          "InputParameters": {
+            "SourceProfileTemplate": "${workflow.input.SPT}",
+            "TargetProfileName": "${workflow.input.SP_NAME}"
+          },
+          "Label": "New Server Profile from Template",
+          "Name": "NewServerProfileFromTemplate1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SetServerToServerProfile1",
+          "TaskDefinitionName": "NewServerProfileFromTemplate",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Sets server to server profile with server and profile as inputs.\nIf the selected server is already part of another profile or if the selected profile has a different server previously assigned to it, then an error is displayed.\nOn successful execution, the profile status will be provided as output.",
+          "InputParameters": {
+            "Profile": "${NewServerProfileFromTemplate1.output.Profile}",
+            "Server": "${workflow.input.SERVER}"
+          },
+          "Label": "Set Server to Server Profile",
+          "Name": "SetServerToServerProfile1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "DeployServerProfile1",
+          "TaskDefinitionName": "SetServerToServerProfile",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Deploys the selected server profile on the server\nOn successful execution, the Deploy Server Profile workflow will be triggered.\n",
+          "InputParameters": {
+            "Profile": "${NewServerProfileFromTemplate1.output.Profile}"
+          },
+          "Label": "Deploy Server Profile",
+          "Name": "DeployServerProfile1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SuccessEndTask",
+          "TaskDefinitionName": "DeployServerProfile",
+          "Version": 1
+        },
+        {
+          "Name": "SuccessEndTask",
+          "ObjectType": "workflow.SuccessEndTask"
+        },
+        {
+          "Name": "FailureEndTask",
+          "ObjectType": "workflow.FailureEndTask"
+        }
+      ],
+      "UiInputFilters": [],
+      "UiRenderingData": {
+        "Positions": [
+          {
+            "Name": "StartTask",
+            "X": 263.5,
+            "Y": 75
+          },
+          {
+            "Name": "SuccessEndTask",
+            "X": 263.5,
+            "Y": 509
+          },
+          {
+            "Name": "FailureEndTask",
+            "X": 405.5,
+            "Y": 510
+          },
+          {
+            "Name": "NewServerProfileFromTemplate1",
+            "X": 178.5,
+            "Y": 146
+          },
+          {
+            "Name": "SetServerToServerProfile1",
+            "X": 178.5,
+            "Y": 234
+          },
+          {
+            "Name": "DeployServerProfile1",
+            "X": 178.5,
+            "Y": 322
+          }
+        ]
+      },
+      "VariableDefinition": [],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/WorkflowDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.TaskDefinition",
+      "DefaultVersion": true,
+      "Description": "Create a Virtual Media Policy that will mount an HTTP(s) URL on the CIMC",
+      "Label": "Create HTTP Virtual Media Policy",
+      "Name": "CreateHTTPVirtualMediaPolicy",
+      "ObjectType": "workflow.TaskDefinition",
+      "Properties": {
+        "ExternalMeta": true,
+        "InputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "Policy Name",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Name",
+            "Name": "Name",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The Name of the Volume to be mounted",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Volume Name",
+            "Name": "VolumeName",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "HTTP or HTTPS",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Protocol",
+            "Name": "Protocol",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The URL to your ISO",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "URL",
+            "Name": "URL",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          }
+        ],
+        "ObjectType": "workflow.Properties",
+        "OutputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Moid",
+            "Name": "Moid",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            }
+          }
+        ],
+        "RetryCount": 3,
+        "RetryDelay": 60,
+        "RetryPolicy": "Fixed",
+        "SupportStatus": "Supported",
+        "Timeout": 600,
+        "TimeoutPolicy": "Timeout"
+      },
+      "RollbackTasks": [],
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/TaskDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.TaskDefinition",
+      "DefaultVersion": true,
+      "Description": "Get Profiles attached to a Template",
+      "Label": "Get Server Profiles attached to Template",
+      "Name": "GetServerProfilesattachedtoTemplate",
+      "ObjectType": "workflow.TaskDefinition",
+      "Properties": {
+        "ExternalMeta": true,
+        "InputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The server profile template that needs to be synced.",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Server Profile Template",
+            "Name": "SPT",
+            "ObjectType": "workflow.MoReferenceDataType",
+            "Properties": [
+              {
+                "DisplayAttributes": [
+                  "Name"
+                ],
+                "ObjectType": "workflow.MoReferenceProperty",
+                "Selector": "/api/v1/server/ProfileTemplates",
+                "SelectorProperty": {
+                  "Method": "GET",
+                  "ObjectType": "workflow.SelectorProperty"
+                }
+              }
+            ],
+            "Required": true
+          }
+        ],
+        "ObjectType": "workflow.Properties",
+        "OutputDefinition": [
+          {
+            "ArrayItemType": {
+              "ObjectType": "workflow.PrimitiveArrayItem",
+              "Properties": {
+                "Constraints": {
+                  "EnumList": [],
+                  "ObjectType": "workflow.Constraints"
+                },
+                "InventorySelector": [],
+                "ObjectType": "workflow.PrimitiveDataProperty",
+                "Type": "string"
+              }
+            },
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "List of the Server Profile Moid's which are attached to the Server Profile Template",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Server Profile Moids",
+            "Max": 9999,
+            "Min": 1,
+            "Name": "ServerProfileMoids",
+            "ObjectType": "workflow.ArrayDataType"
+          }
+        ],
+        "RetryCount": 3,
+        "RetryDelay": 60,
+        "RetryPolicy": "Fixed",
+        "SupportStatus": "Supported",
+        "Timeout": 600,
+        "TimeoutPolicy": "Timeout"
+      },
+      "RollbackTasks": [],
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/TaskDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.TaskDefinition",
+      "DefaultVersion": true,
+      "Description": "This task will add your Policy to a Server Profile Template Policy Bucket and will do it for all the attached profiles",
+      "Label": "Add Policy to Server Profile",
+      "Name": "AddPolicytoServerProfile",
+      "ObjectType": "workflow.TaskDefinition",
+      "Properties": {
+        "ExternalMeta": true,
+        "InputDefinition": [
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The Moid of the Server Profile you want to add a Policy too",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Server Profile Moid",
+            "Name": "SP",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The Policy you would like to add to the Server Profile Template",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Policy MoId",
+            "Name": "PolicyMoId",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The ObjectType of the Policy",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Policy Type",
+            "Name": "PolicyType",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          }
+        ],
+        "ObjectType": "workflow.Properties",
+        "OutputDefinition": [],
+        "RetryCount": 3,
+        "RetryDelay": 60,
+        "RetryPolicy": "Fixed",
+        "SupportStatus": "Supported",
+        "Timeout": 600,
+        "TimeoutPolicy": "Timeout"
+      },
+      "RollbackTasks": [],
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/TaskDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.WorkflowDefinition",
+      "DefaultVersion": true,
+      "Description": "Create a Virtual Media Policy and attach it to your Server Profiles.\n\n1. Create Virtual Media Policy\n2. Attach the Policy to the Template\n3. Sync the Template with the Profiles",
+      "InputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "8bde4ee5-a6a9-4698-bb17-88a6fb6f5b42-discovery.iso"
+          },
+          "Description": "The name of the ISO file",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "ISO",
+          "Name": "ISO",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "ico-test"
+          },
+          "Description": "Name of the OpenShift Cluster",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Cluster Name",
+          "Name": "ClusterName",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true
+          },
+          "Description": "The Server Profile Template you would like to add a Policy too",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Server Profile Template",
+          "Name": "SPT",
+          "ObjectType": "workflow.MoReferenceDataType",
+          "Properties": [
+            {
+              "DisplayAttributes": [
+                "Name"
+              ],
+              "ObjectType": "workflow.MoReferenceProperty",
+              "Selector": "/api/v1/server/ProfileTemplates",
+              "SelectorProperty": {
+                "Method": "GET",
+                "ObjectType": "workflow.SelectorProperty"
+              }
+            }
+          ],
+          "Required": true
+        }
+      ],
+      "InputParameterSet": [],
+      "Label": "Create vMedia Policy and attach to Server Profile",
+      "Name": "createVmediaPolicyAndAttachToServerProfiles",
+      "ObjectType": "workflow.WorkflowDefinition",
+      "OutputDefinition": [],
+      "Properties": {
+        "EnableDebug": true,
+        "ExternalMeta": true,
+        "ObjectType": "workflow.WorkflowProperties",
+        "SupportStatus": "Supported"
+      },
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Tasks": [
+        {
+          "Name": "StartTask",
+          "NextTask": "CreateHTTPVirtualMediaPolicy1",
+          "ObjectType": "workflow.StartTask"
+        },
+        {
+          "Name": "SuccessEndTask",
+          "ObjectType": "workflow.SuccessEndTask"
+        },
+        {
+          "Name": "FailureEndTask",
+          "ObjectType": "workflow.FailureEndTask"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Create a Virtual Media Policy that will mount an HTTP(s) URL on the CIMC",
+          "InputParameters": {
+            "Name": "{{ .global.workflow.input.ClusterName}}-discovery",
+            "Protocol": "http",
+            "URL": "http://ec2-3-131-159-111.us-east-2.compute.amazonaws.com/files/{{ .global.workflow.input.ISO }}",
+            "VolumeName": "OpenShift-discovery"
+          },
+          "Label": "Create HTTP Virtual Media Policy",
+          "Name": "CreateHTTPVirtualMediaPolicy1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "GetServerProfilesattachedtoTemplate1",
+          "TaskDefinitionName": "CreateHTTPVirtualMediaPolicy",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Get Profiles attached to a Template",
+          "InputParameters": {
+            "SPT": "${workflow.input.SPT}"
+          },
+          "Label": "Get Server Profiles attached to Template",
+          "Name": "GetServerProfilesattachedtoTemplate1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "serialLoop1",
+          "TaskDefinitionName": "GetServerProfilesattachedtoTemplate",
+          "Version": 1
+        },
+        {
+          "Count": "{{ len .global.GetServerProfilesattachedtoTemplate1.output.ServerProfileMoids }}",
+          "Description": "A Serial Loop is a control task that runs one or more worker tasks multiple times based on a specified count or a given condition.  Either count or condition must be provided, not both.  When the loop is executed, based on count or condition, each iteration of task or a sequence of tasks inside loop run in serial.  If any of the task fail then the entire loop will fail.",
+          "Label": "Serial Loop",
+          "LoopStartTask": "AddPolicytoServerProfile1",
+          "Name": "serialLoop1",
+          "ObjectType": "workflow.SerialLoopTask",
+          "OnSuccess": "SuccessEndTask"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "This task will add your Policy to a Server Profile Template Policy Bucket and will do it for all the attached profiles",
+          "InputParameters": {
+            "PolicyMoId": "${CreateHTTPVirtualMediaPolicy1.output.Moid}",
+            "PolicyType": "vmedia.Policy",
+            "SP": "{{ index .global.GetServerProfilesattachedtoTemplate1.output.ServerProfileMoids .iteration }}"
+          },
+          "Label": "Add Policy to Server Profile",
+          "Name": "AddPolicytoServerProfile1",
+          "ObjectType": "workflow.WorkerTask",
+          "TaskDefinitionName": "AddPolicytoServerProfile",
+          "Version": 1
+        }
+      ],
+      "UiInputFilters": [],
+      "UiRenderingData": {
+        "Positions": [
+          {
+            "Name": "StartTask",
+            "X": 273.5,
+            "Y": 87.5
+          },
+          {
+            "Name": "SuccessEndTask",
+            "X": 273.5,
+            "Y": 570
+          },
+          {
+            "Name": "FailureEndTask",
+            "X": 415.5,
+            "Y": 570
+          },
+          {
+            "Name": "CreateHTTPVirtualMediaPolicy1",
+            "X": 188.5,
+            "Y": 171
+          },
+          {
+            "Name": "GetServerProfilesattachedtoTemplate1",
+            "X": 188.5,
+            "Y": 270
+          },
+          {
+            "Name": "serialLoop1",
+            "X": 178.5,
+            "Y": 369
+          },
+          {
+            "Name": "AddPolicytoServerProfile1",
+            "X": 188.5,
+            "Y": 460
+          }
+        ]
+      },
+      "VariableDefinition": [],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/WorkflowDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.WorkflowDefinition",
+      "DefaultVersion": true,
+      "Description": "This Workflow will\n1. Validate if your cluster is ready for install \n2. Start the OpenShift installation",
+      "InputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJhZDUyMjdhMy1iY2ZkLTRjZjAtYTdiNi0zOTk4MzVhMDg1NjYifQ.eyJpYXQiOjE2NjQ4NTUyNDcsImp0aSI6IjQyYzg4ZDIwLWFlMDktNDMwNi05YzJkLWFiNjlmM2YwNjljYSIsImlzcyI6Imh0dHBzOi8vc3NvLnJlZGhhdC5jb20vYXV0aC9yZWFsbXMvcmVkaGF0LWV4dGVybmFsIiwiYXVkIjoiaHR0cHM6Ly9zc28ucmVkaGF0LmNvbS9hdXRoL3JlYWxtcy9yZWRoYXQtZXh0ZXJuYWwiLCJzdWIiOiJmOjUyOGQ3NmZmLWY3MDgtNDNlZC04Y2Q1LWZlMTZmNGZlMGNlNjpib3Jpcy5hZWxlbiIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJjbG91ZC1zZXJ2aWNlcyIsIm5vbmNlIjoiNGE1NjMzNWUtZGFmOC00MzY3LTgzYjQtNTQxMjc0ODU2ZjdlIiwic2Vzc2lvbl9zdGF0ZSI6ImI2OWVlYjdlLTBkYzQtNDM1OC1iMDk3LTQyY2NiMWQ4ZWZlMyIsInNjb3BlIjoib3BlbmlkIGFwaS5pYW0uc2VydmljZV9hY2NvdW50cyBvZmZsaW5lX2FjY2VzcyIsInNpZCI6ImI2OWVlYjdlLTBkYzQtNDM1OC1iMDk3LTQyY2NiMWQ4ZWZlMyJ9.gr-gTfybvVHyCF4B1uNHrWhm_zy4Ahx3zOXmPnFPqus"
+          },
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Redhat API Token",
+          "Name": "OFFLINE_TOKEN",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "228d9eb7-437a-4685-a67f-b19b9b14b861"
+          },
+          "Description": "The ID of the OpenShift Cluster",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Cluster ID",
+          "Name": "CLUSTER_ID",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        }
+      ],
+      "InputParameterSet": [],
+      "Label": "Install OpenShift Cluster",
+      "Name": "InstallOpenShiftCluster",
+      "ObjectType": "workflow.WorkflowDefinition",
+      "OutputDefinition": [],
+      "OutputParameters": {},
+      "Properties": {
+        "EnableDebug": true,
+        "ExternalMeta": true,
+        "ObjectType": "workflow.WorkflowProperties",
+        "SupportStatus": "Supported"
+      },
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Tasks": [
+        {
+          "Name": "StartTask",
+          "NextTask": "RHTarget",
+          "ObjectType": "workflow.StartTask"
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Claims a new target endpoint in Intersight. The supported target types are HTTP , SSH, Powershell and Ansible endpoint.",
+          "InputParameters": {
+            "ClaimTargetOptions": {
+              "AuthenticationRequired": false,
+              "ConnectViaAssist": false,
+              "EnableHTTPSProtocol": true,
+              "TargetType": "HTTPEndpoint"
+            },
+            "Host": "sso.redhat.com",
+            "Name": "Redhat SSO",
+            "Port": 443
+          },
+          "Label": "Add Redhat SSO Target",
+          "Name": "RHTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "OpenshiftTarget",
+          "TaskDefinitionName": "NewTarget",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Claims a new target endpoint in Intersight. The supported target types are HTTP , SSH, Powershell and Ansible endpoint.",
+          "InputParameters": {
+            "ClaimTargetOptions": {
+              "AuthenticationRequired": false,
+              "ConnectViaAssist": false,
+              "EnableHTTPSProtocol": true,
+              "TargetType": "HTTPEndpoint"
+            },
+            "Host": "api.openshift.com",
+            "Name": "Openshift API",
+            "Port": 443
+          },
+          "Label": "Add Openshift API Target",
+          "Name": "OpenshiftTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "serialLoop1",
+          "TaskDefinitionName": "NewTarget",
+          "Version": 1
+        },
+        {
+          "Condition": "if (${getClusterStatus2.output.Parameters.ClusterStatus} === \"ready\") { false; } else { true; } ",
+          "Description": "A Serial Loop is a control task that runs one or more worker tasks multiple times based on a specified count or a given condition.  Either count or condition must be provided, not both.  When the loop is executed, based on count or condition, each iteration of task or a sequence of tasks inside loop run in serial.  If any of the task fail then the entire loop will fail.",
+          "Label": "Check cluster readiness",
+          "LoopStartTask": "InvokeSleepTask1",
+          "Name": "serialLoop1",
+          "ObjectType": "workflow.SerialLoopTask",
+          "OnSuccess": "GetRedHatJWT1"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Get's a JWT from Red Hat which you can use for 15 minutes",
+          "InputParameters": {
+            "OFFLINE_TOKEN": "${workflow.input.OFFLINE_TOKEN}",
+            "Target": "${RHTarget.output.Target}"
+          },
+          "Label": "Get Red Hat JWT",
+          "Name": "GetRedHatJWT2",
+          "ObjectType": "workflow.WorkerTask",
+          "OnSuccess": "getClusterStatus2",
+          "TaskDefinitionName": "GetRedHatJWT",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "InputParameters": {
+            "ContentType": "json",
+            "Headers": {
+              "Authorization": "Bearer {{ .global.GetRedHatJWT2.output.JWT }}",
+              "Content-Type": "application/json",
+              "accept": "application/json"
+            },
+            "Method": "GET",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "ClusterStatus",
+                  "Path": "$.status",
+                  "Type": "string"
+                }
+              ]
+            },
+            "Target": "${OpenshiftTarget.output.Target}",
+            "Url": "/api/assisted-install/v2/clusters/{{ .global.workflow.input.CLUSTER_ID }}"
+          },
+          "Label": "Get Cluster Status",
+          "Name": "getClusterStatus2",
+          "ObjectType": "workflow.WorkerTask",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "VariableParameters": {
+            "ClusterStatus": "${getClusterStatus2.output.Parameters.ClusterStatus}"
+          },
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "InputParameters": {
+            "ContentType": "json",
+            "Headers": {
+              "Authorization": "Bearer {{ .global.GetRedHatJWT1.output.JWT }}",
+              "Content-Type": "application/json",
+              "accept": "application/json"
+            },
+            "Method": "POST",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "Response",
+                  "Path": "$",
+                  "Type": "json"
+                }
+              ]
+            },
+            "Target": "${OpenshiftTarget.output.Target}",
+            "Url": "/api/assisted-install/v2/clusters/{{ .global.workflow.input.CLUSTER_ID }}/actions/install"
+          },
+          "Label": "Install OpenShift Cluster",
+          "Name": "installOpenshiftCluster",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "removeOpenshiftTarget",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Unclaims the target endpoint from Intersight. When a target is unclaimed, it is immediately detached from the corresponding Intersight account. The target retains any configuration applied before the unclaim operation. You can unclaim any type of target endpoints. ",
+          "InputParameters": {
+            "Target": "${RHTarget.output.Target}"
+          },
+          "Label": "Remove Redhat SSO Target",
+          "Name": "removeRHTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SuccessEndTask",
+          "TaskDefinitionName": "RemoveTarget",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Unclaims the target endpoint from Intersight. When a target is unclaimed, it is immediately detached from the corresponding Intersight account. The target retains any configuration applied before the unclaim operation. You can unclaim any type of target endpoints. ",
+          "InputParameters": {
+            "Target": "${OpenshiftTarget.output.Target}"
+          },
+          "Label": "Remove Openshift API Target",
+          "Name": "removeOpenshiftTarget",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "removeRHTarget",
+          "TaskDefinitionName": "RemoveTarget",
+          "Version": 1
+        },
+        {
+          "Name": "SuccessEndTask",
+          "ObjectType": "workflow.SuccessEndTask"
+        },
+        {
+          "Name": "FailureEndTask",
+          "ObjectType": "workflow.FailureEndTask"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Get's a JWT from Red Hat which you can use for 15 minutes",
+          "InputParameters": {
+            "OFFLINE_TOKEN": "${workflow.input.OFFLINE_TOKEN}",
+            "Target": "${RHTarget.output.Target}"
+          },
+          "Label": "Get Red Hat JWT 2",
+          "Name": "GetRedHatJWT1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnSuccess": "installOpenshiftCluster",
+          "TaskDefinitionName": "GetRedHatJWT",
+          "Version": 1
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Pauses the current workflow for the specified duration.",
+          "InputParameters": {
+            "SleepTimeInSec": 60
+          },
+          "Label": "Sleep Task",
+          "Name": "InvokeSleepTask1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnSuccess": "GetRedHatJWT2",
+          "TaskDefinitionName": "InvokeSleepTask",
+          "Version": 1
+        }
+      ],
+      "UiInputFilters": [],
+      "UiRenderingData": {
+        "Positions": [
+          {
+            "Name": "StartTask",
+            "X": 313.5,
+            "Y": -119.5
+          },
+          {
+            "Name": "SuccessEndTask",
+            "X": 313.5,
+            "Y": 869
+          },
+          {
+            "Name": "FailureEndTask",
+            "X": 455.5,
+            "Y": 869
+          },
+          {
+            "Name": "RHTarget",
+            "X": 228.5,
+            "Y": -30.5
+          },
+          {
+            "Name": "removeRHTarget",
+            "X": 228.5,
+            "Y": 781
+          },
+          {
+            "Name": "removeOpenshiftTarget",
+            "X": 228.5,
+            "Y": 693
+          },
+          {
+            "Name": "OpenshiftTarget",
+            "X": 228.5,
+            "Y": 63
+          },
+          {
+            "Name": "installOpenshiftCluster",
+            "X": 228.5,
+            "Y": 605
+          },
+          {
+            "Name": "serialLoop1",
+            "X": 218.5,
+            "Y": 162
+          },
+          {
+            "Name": "getClusterStatus",
+            "X": 189.5,
+            "Y": 308
+          },
+          {
+            "Name": "GetRedHatJWT2",
+            "X": 228.5,
+            "Y": 330
+          },
+          {
+            "Name": "getClusterStatus2",
+            "X": 228.5,
+            "Y": 407
+          },
+          {
+            "Name": "GetRedHatJWT1",
+            "X": 228.5,
+            "Y": 517
+          },
+          {
+            "Name": "InvokeSleepTask1",
+            "X": 228.5,
+            "Y": 253
+          }
+        ]
+      },
+      "VariableDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Value": "api.openshift.com"
+          },
+          "Description": "Relative URL for Intersight, Device Registration and Target APIs. Does not support specifying fully qualified URL.\n",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "openshift_api",
+          "Name": "openshift_api",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Value": "pending"
+          },
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "ClusterStatus",
+          "Name": "ClusterStatus",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          }
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/WorkflowDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.TaskDefinition",
+      "DefaultVersion": true,
+      "Description": "Get the MAC address for one or multiple servers for a specific NIC",
+      "Label": "Get MAC Address",
+      "Name": "GetMACAddress",
+      "ObjectType": "workflow.TaskDefinition",
+      "Properties": {
+        "ExternalMeta": true,
+        "InputDefinition": [
+          {
+            "ArrayItemType": {
+              "ObjectType": "workflow.MoReferenceArrayItem",
+              "Properties": [
+                {
+                  "DisplayAttributes": [
+                    "Name",
+                    "Model"
+                  ],
+                  "ObjectType": "workflow.MoReferenceProperty",
+                  "Selector": "/api/v1/compute/PhysicalSummaries",
+                  "SelectorProperty": {
+                    "Method": "GET",
+                    "ObjectType": "workflow.SelectorProperty"
+                  }
+                }
+              ]
+            },
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Servers",
+            "Max": 16,
+            "Min": 1,
+            "Name": "SERVERS",
+            "ObjectType": "workflow.ArrayDataType",
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The Name of the NIC you want the MAC address of",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "NIC Name",
+            "Name": "NIC_NAME",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          },
+          {
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "something like \"L\" or \"MLOM\"",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "Adapter ID Name",
+            "Name": "AdapterID",
+            "ObjectType": "workflow.PrimitiveDataType",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            },
+            "Required": true
+          }
+        ],
+        "ObjectType": "workflow.Properties",
+        "OutputDefinition": [
+          {
+            "ArrayItemType": {
+              "ObjectType": "workflow.PrimitiveArrayItem",
+              "Properties": {
+                "Constraints": {
+                  "EnumList": [],
+                  "ObjectType": "workflow.Constraints"
+                },
+                "InventorySelector": [],
+                "ObjectType": "workflow.PrimitiveDataProperty",
+                "Type": "string"
+              }
+            },
+            "Default": {
+              "ObjectType": "workflow.DefaultValue"
+            },
+            "Description": "The MAC Address of the server.",
+            "DisplayMeta": {
+              "InventorySelector": true,
+              "ObjectType": "workflow.DisplayMeta",
+              "WidgetType": "None"
+            },
+            "Label": "MAC Adress",
+            "Max": 16,
+            "Min": 1,
+            "Name": "MAC_ADDRESS",
+            "ObjectType": "workflow.ArrayDataType"
+          }
+        ],
+        "RetryCount": 3,
+        "RetryDelay": 60,
+        "RetryPolicy": "Fixed",
+        "SupportStatus": "Supported",
+        "Timeout": 600,
+        "TimeoutPolicy": "Timeout"
+      },
+      "RollbackTasks": [],
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Version": 1
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/TaskDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "ClassId": "workflow.WorkflowDefinition",
+      "DefaultVersion": true,
+      "Description": "With adapter select",
+      "InputDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true
+          },
+          "Description": "Select the Server Profile Template you would like to use",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Server Profile Template",
+          "Name": "SPT",
+          "ObjectType": "workflow.MoReferenceDataType",
+          "Properties": [
+            {
+              "DisplayAttributes": [
+                "Name",
+                "Description",
+                "TargetPlatform"
+              ],
+              "ObjectType": "workflow.MoReferenceProperty",
+              "Selector": "/api/v1/server/ProfileTemplates",
+              "SelectorProperty": {
+                "Method": "GET",
+                "ObjectType": "workflow.SelectorProperty"
+              }
+            }
+          ],
+          "Required": true
+        },
+        {
+          "ArrayItemType": {
+            "ObjectType": "workflow.MoReferenceArrayItem",
+            "Properties": [
+              {
+                "DisplayAttributes": [
+                  "Name",
+                  "Model",
+                  "Serial",
+                  "ManagementMode",
+                  "Firmware",
+                  "MgmtIpAddress"
+                ],
+                "ObjectType": "workflow.MoReferenceProperty",
+                "Selector": "/api/v1/compute/PhysicalSummaries",
+                "SelectorProperty": {
+                  "Method": "GET",
+                  "ObjectType": "workflow.SelectorProperty"
+                }
+              }
+            ]
+          },
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Please select the servers you would like to deploy Openshift onto",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Servers",
+          "Max": 16,
+          "Min": 3,
+          "Name": "SERVERS",
+          "ObjectType": "workflow.ArrayDataType",
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "You can get your Token from https://console.redhat.com/openshift/token/show",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Redhat API Token",
+          "Name": "OFFLINE_TOKEN",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The name of the Openshift Cluster you want to create",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Cluster name",
+          "Name": "CLUSTER_NAME",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 54,
+              "Min": 1,
+              "ObjectType": "workflow.Constraints",
+              "Regex": "^[a-z-]?[a-z-0-9\\-\\.]+[a-z-]?$"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The domain name that is used for the Openshift Cluster",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Base domain",
+          "Name": "DOMAIN_NAME",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 63,
+              "Min": 3,
+              "ObjectType": "workflow.Constraints",
+              "Regex": "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "4.11"
+          },
+          "Description": "The version of OpenShift you would like to install",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "OpenShift version",
+          "Name": "VERSION",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [
+                {
+                  "Label": "4.12 - Developer Preview Release",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.12"
+                },
+                {
+                  "Label": "4.11",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.11"
+                },
+                {
+                  "Label": "4.10",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.10"
+                },
+                {
+                  "Label": "4.9",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "4.9"
+                }
+              ],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "enum"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Your public key that will be added to the hosts for the 'core' user",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "SSH public key",
+          "Name": "SSH_PUB_KEY",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Additional NTP servers to use. Leave empty to use default RHCOS internet NTP servers",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "NTP servers",
+          "Name": "NTP_SERVERS",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "enable this specify static IP, VLAN or bonding. Leave empty for DHCP",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Static IP",
+          "Name": "STATIC",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "boolean"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The VLAN ID to use. Leave empty for no VLAN configuration",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "VLAN ID",
+          "Name": "VLAN_ID",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 4096,
+              "Min": 1,
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "integer"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "MLOM"
+          },
+          "Description": "something like \"L\" or \"MLOM\"",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Adapter ID Name",
+          "Name": "AdapterID",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "ArrayItemType": {
+            "ObjectType": "workflow.PrimitiveArrayItem",
+            "Properties": {
+              "Constraints": {
+                "EnumList": [],
+                "ObjectType": "workflow.Constraints"
+              },
+              "InventorySelector": [],
+              "ObjectType": "workflow.PrimitiveDataProperty",
+              "Type": "string"
+            }
+          },
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": [
+              "eth0"
+            ]
+          },
+          "Description": "When creating a bond please add multiple NIC's using the plus sign",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "NIC name - add 2 or more to create a bond - not properly tested",
+          "Max": 4,
+          "Min": 1,
+          "Name": "NIC",
+          "ObjectType": "workflow.ArrayDataType",
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "active-backup"
+          },
+          "Description": "The mode in which you would like to bond the NICs. Please check here for more details https://docs.openshift.com/container-platform/4.9/networking/k8s_nmstate/k8s-nmstate-updating-node-network-config.html#virt-example-bond-nncp_k8s_nmstate-updating-node-network-config",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Link aggregation mode - only required for bonding",
+          "Name": "BOND_MODE",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [
+                {
+                  "Label": "active-backup",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "active-backup"
+                },
+                {
+                  "Label": "balance-xor",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "balance-xor"
+                },
+                {
+                  "Label": "802.3ad - LACP",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "802.3ad"
+                },
+                {
+                  "Label": "balance-tlb",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "balance-tlb"
+                },
+                {
+                  "Label": "balance-alb",
+                  "ObjectType": "workflow.EnumEntry",
+                  "Value": "balance-alb"
+                }
+              ],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "enum"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Length of your network prefix. For example 24",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Network Prefix Length",
+          "Name": "PREFIX_LENGTH",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "Max": 32,
+              "Min": 1,
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "integer"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "DNS Server is used to get the hostnames of your hosts with a reverse IP lookup.",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "DNS",
+          "Name": "DNS_SERVER",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Your gateway to Valhalla",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Gateway",
+          "Name": "GATEWAY",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "ArrayItemType": {
+            "ObjectType": "workflow.CustomArrayItem",
+            "Properties": {
+              "CatalogMoid": "shared",
+              "CustomDataTypeName": "IpV4AddressType",
+              "ObjectType": "workflow.CustomDataProperty"
+            }
+          },
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "List of IP's to use for the OpenShift servers. Click the plus sign to add more.",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "IP Addresses",
+          "Max": 16,
+          "Min": 1,
+          "Name": "IPS",
+          "ObjectType": "workflow.ArrayDataType",
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The IP Address that will be assigned to the Kubernetes API",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "API IP Address",
+          "Name": "API_IP",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "The IP Address that will be assigned to the ingress gateway",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Ingress IP Address",
+          "Name": "INGRESS_IP",
+          "ObjectType": "workflow.CustomDataType",
+          "Properties": {
+            "CatalogMoid": "shared",
+            "CustomDataTypeName": "IpV4AddressType",
+            "ObjectType": "workflow.CustomDataProperty"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "10.128.0.0/14"
+          },
+          "Description": "The CIDR used for the POD network",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "POD CIDR",
+          "Name": "POD_CIDR",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Override": true,
+            "Value": "172.30.0.0/16"
+          },
+          "Description": "The CIDR used for the service network",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Service CIDR",
+          "Name": "SERVICE_CIDR",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Run virtual machines alongside containers on one platform. Additional Requirements      Enabled CPU virtualization support in BIOS (Intel-VT / AMD-V) on all nodes     Each worker node requires an additional 360 MiB of memory and 2 CPUs     Each control plane node requires an additional 150 MiB of memory and 4 CPUs     OpenShift Data Foundation (recommended for full functionality) or another persistent storage service",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Install OpenShift Virtualization",
+          "Name": "OSV",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "boolean"
+          }
+        },
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue"
+          },
+          "Description": "Persistent software-defined storage for hybrid applications. ",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "Install OpenShift Data Foundation",
+          "Name": "ODF",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "boolean"
+          }
+        }
+      ],
+      "InputParameterSet": [
+        {
+          "Condition": "eq",
+          "ControlParameter": "STATIC",
+          "EnableParameters": [
+            "VLAN_ID",
+            "AdapterID",
+            "NIC",
+            "BOND_MODE",
+            "PREFIX_LENGTH",
+            "GATEWAY",
+            "DNS_SERVER",
+            "IPS"
+          ],
+          "Name": "STATIC",
+          "ObjectType": "workflow.ParameterSet",
+          "Value": "true"
+        }
+      ],
+      "Label": "Provision Red Hat OpenShift bare metal cluster",
+      "Name": "ProvisionRedHatOpenShiftbaremetalCluster",
+      "ObjectType": "workflow.WorkflowDefinition",
+      "OutputDefinition": [],
+      "OutputParameters": {},
+      "Properties": {
+        "ExternalMeta": true,
+        "ObjectType": "workflow.WorkflowProperties",
+        "RollbackOnCancel": true,
+        "RollbackOnFailure": true,
+        "SupportStatus": "Supported"
+      },
+      "SharedScope": "user",
+      "Tags": [
+        {
+          "Key": "category",
+          "Value": "Compute"
+        }
+      ],
+      "Tasks": [
+        {
+          "Name": "StartTask",
+          "NextTask": "parallelLoop1",
+          "ObjectType": "workflow.StartTask"
+        },
+        {
+          "Count": "{{ len .global.workflow.input.SERVERS}}",
+          "Description": "A Parallel Loop is a control task that runs one task or one sub-workflow multiple times based on a specified count.  The count can be a static value that is specified during design time or a dynamic value that is derived from workflow inputs or task outputs.  When the loop is executed, the count 'N' is determined, N tasks or sub-workflows are scheduled for execution in parallel.  When all N instances of the task or sub-workflow reach a final state the parallel loop will complete and workflow execution will move on to the next task.  If any one of the tasks or sub-workflows fails, then the entire loop will fail.  Dynamic values for count must be specified as a template.  For example, if a loop must run for a count which matches the length of a workflow input called StringArray, then the count must be specified using a template '{{ len .global.workflow.input.StringArray }}'.  The iteration of the loop is available using the keyword '.iteration' and it can be used to control inputs that feed into the task.  For example, the task inside the loop needs to take one value from the workflow input StringArray, then the task string input can be mapped to the template '{{ index .global.workflow.input.StringArray .iteration}}' during design.",
+          "Label": "Boot Servers",
+          "LoopStartTask": "BootServerfromvMedia1",
+          "Name": "parallelLoop2",
+          "NumberOfBatches": 1,
+          "ObjectType": "workflow.LoopTask",
+          "OnSuccess": "InstallOpenShiftCluster1",
+          "Parallel": true
+        },
+        {
+          "Count": "{{ len .global.workflow.input.SERVERS}}",
+          "Description": "A Parallel Loop is a control task that runs one task or one sub-workflow multiple times based on a specified count.  The count can be a static value that is specified during design time or a dynamic value that is derived from workflow inputs or task outputs.  When the loop is executed, the count 'N' is determined, N tasks or sub-workflows are scheduled for execution in parallel.  When all N instances of the task or sub-workflow reach a final state the parallel loop will complete and workflow execution will move on to the next task.  If any one of the tasks or sub-workflows fails, then the entire loop will fail.  Dynamic values for count must be specified as a template.  For example, if a loop must run for a count which matches the length of a workflow input called StringArray, then the count must be specified using a template '{{ len .global.workflow.input.StringArray }}'.  The iteration of the loop is available using the keyword '.iteration' and it can be used to control inputs that feed into the task.  For example, the task inside the loop needs to take one value from the workflow input StringArray, then the task string input can be mapped to the template '{{ index .global.workflow.input.StringArray .iteration}}' during design.",
+          "Label": "Deploy server profiles",
+          "LoopStartTask": "CreateandDeployServerProfile1",
+          "Name": "parallelLoop1",
+          "NumberOfBatches": 1,
+          "ObjectType": "workflow.LoopTask",
+          "OnSuccess": "GetMACAddress1",
+          "Parallel": true
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "This Workflow will\n1. Create Red Hat and OpenShift Targets\n2. Create an OpenShift cluster in Red Hat's Hybrid Cloud Console and get the custom generated ISO",
+          "InputParameters": {
+            "API_IP": "${workflow.input.API_IP}",
+            "BOND_MODE": "${workflow.input.BOND_MODE}",
+            "CLUSTER_NAME": "${workflow.input.CLUSTER_NAME}",
+            "DNS_SERVER": "${workflow.input.DNS_SERVER}",
+            "DOMAIN_NAME": "${workflow.input.DOMAIN_NAME}",
+            "GATEWAY": "${workflow.input.GATEWAY}",
+            "INGRESS_IP": "${workflow.input.INGRESS_IP}",
+            "IPS": "${workflow.input.IPS}",
+            "MAC_ADDRESS": "${GetMACAddress1.output.MAC_ADDRESS}",
+            "NIC": "${workflow.input.NIC}",
+            "NTP_SERVERS": "${workflow.input.NTP_SERVERS}",
+            "ODF": "${workflow.input.ODF}",
+            "OFFLINE_TOKEN": "${workflow.input.OFFLINE_TOKEN}",
+            "OSV": "${workflow.input.OSV}",
+            "POD_CIDR": "${workflow.input.POD_CIDR}",
+            "PREFIX_LENGTH": "${workflow.input.PREFIX_LENGTH}",
+            "SERVICE_CIDR": "${workflow.input.SERVICE_CIDR}",
+            "SSH_PUB_KEY": "${workflow.input.SSH_PUB_KEY}",
+            "STATIC": "${workflow.input.STATIC}",
+            "VERSION": "${workflow.input.VERSION}",
+            "VLAN_ID": "${workflow.input.VLAN_ID}"
+          },
+          "Label": "Create OpenShift Cluster",
+          "Name": "CreateOpenshiftBMCluster1",
+          "ObjectType": "workflow.SubWorkflowTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "InvokeGenericWebApi1",
+          "Version": 1,
+          "WorkflowDefinitionName": "CreateOpenshiftBMCluster"
+        },
+        {
+          "CatalogMoid": "user",
+          "InputParameters": {
+            "OneTimeBootDevice": "CIMC-DVD",
+            "PowerState": "Power Cycle",
+            "Server": "{{index .global.workflow.input.SERVERS .iteration | ToJson }}"
+          },
+          "Label": "Boot Server from vMedia",
+          "Name": "BootServerfromvMedia1",
+          "ObjectType": "workflow.SubWorkflowTask",
+          "Version": 1,
+          "WorkflowDefinitionName": "BootServerfromvMedia"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "1. Create a new Server Profile from Template\n2. Set a server to the newly created Server Profile\n3. Deploy the Server Profile",
+          "InputParameters": {
+            "NIC_NAME": "${workflow.input.NIC[0]}",
+            "SERVER": "{{index .global.workflow.input.SERVERS .iteration | ToJson }}",
+            "SPT": "${workflow.input.SPT}",
+            "SP_NAME": "{{.global.workflow.input.CLUSTER_NAME}}-{{.iteration}}"
+          },
+          "Label": "Create and Deploy Server Profile",
+          "Name": "CreateandDeployServerProfile1",
+          "ObjectType": "workflow.SubWorkflowTask",
+          "Version": 1,
+          "WorkflowDefinitionName": "CreateandDeployServerProfile"
+        },
+        {
+          "CatalogMoid": "shared",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "InputParameters": {
+            "Target": "${workflow.variable.ISO_HOST}",
+            "Body": {
+              "ContentType": "json",
+              "Text": "{ \n    \"clusterid\": \"{{.global.CreateOpenshiftBMCluster1.output.CLUSTER_ID}}\", \n    \"URL\": \"{{.global.CreateOpenshiftBMCluster1.output.ISO_URL}}\"\n}"
+            },
+            "ContentType": "json",
+            "Headers": {
+              "Content-Type": "application/json"
+            },
+            "Method": "PUT",
+            "ResponseParser": {
+              "Parameters": [
+                {
+                  "Name": "FILE",
+                  "Path": "$",
+                  "Type": "string"
+                }
+              ]
+            },
+            "Url": "/api"
+          },
+          "Label": "Download Discovery ISO",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "createVmediaPolicyAndAttachToServerProfiles1",
+          "TaskDefinitionName": "InvokeGenericWebApi",
+          "Version": 2
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Create a Virtual Media Policy and attach it to your Server Profiles.\n\n1. Create Virtual Media Policy\n2. Attach the Policy to the Template\n3. Sync the Template with the Profiles",
+          "InputParameters": {
+            "ClusterName": "${workflow.input.CLUSTER_NAME}",
+            "ISO": "${InvokeGenericWebApi1.output.Parameters.FILE}",
+            "SPT": "${workflow.input.SPT}"
+          },
+          "Label": "Create vMedia Policy and attach to Server Profile",
+          "Name": "createVmediaPolicyAndAttachToServerProfiles1",
+          "ObjectType": "workflow.SubWorkflowTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "parallelLoop2",
+          "Version": 1,
+          "WorkflowDefinitionName": "createVmediaPolicyAndAttachToServerProfiles"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "This Workflow will\n1. Validate if your cluster is ready for install \n2. Start the OpenShift installation",
+          "InputParameters": {
+            "CLUSTER_ID": "${CreateOpenshiftBMCluster1.output.CLUSTER_ID}",
+            "OFFLINE_TOKEN": "${workflow.input.OFFLINE_TOKEN}"
+          },
+          "Label": "Install OpenShift Cluster",
+          "Name": "InstallOpenShiftCluster1",
+          "ObjectType": "workflow.SubWorkflowTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "SuccessEndTask",
+          "Version": 1,
+          "WorkflowDefinitionName": "InstallOpenShiftCluster"
+        },
+        {
+          "CatalogMoid": "user",
+          "Description": "Get the MAC address for one or multiple servers for a specific NIC",
+          "InputParameters": {
+            "AdapterID": "${workflow.input.AdapterID}",
+            "NIC_NAME": "${workflow.input.NIC[0]}",
+            "SERVERS": "${workflow.input.SERVERS}"
+          },
+          "Label": "Get MAC Address",
+          "Name": "GetMACAddress1",
+          "ObjectType": "workflow.WorkerTask",
+          "OnFailure": "FailureEndTask",
+          "OnSuccess": "CreateOpenshiftBMCluster1",
+          "TaskDefinitionName": "GetMACAddress",
+          "Version": 1
+        },
+        {
+          "Name": "SuccessEndTask",
+          "ObjectType": "workflow.SuccessEndTask"
+        },
+        {
+          "Name": "FailureEndTask",
+          "ObjectType": "workflow.FailureEndTask"
+        }
+      ],
+      "UiInputFilters": [],
+      "UiRenderingData": {
+        "Positions": [
+          {
+            "Name": "StartTask",
+            "X": 39.4999999999998,
+            "Y": 163
+          },
+          {
+            "Name": "SuccessEndTask",
+            "X": 802.4997342959239,
+            "Y": 546
+          },
+          {
+            "Name": "FailureEndTask",
+            "X": 447.6667552346926,
+            "Y": 553.1666666666666
+          },
+          {
+            "Name": "parallelLoop1",
+            "X": -56.500000000000085,
+            "Y": 231
+          },
+          {
+            "Name": "CreateandDeployServerProfile1",
+            "X": -46.500000000000085,
+            "Y": 322
+          },
+          {
+            "Name": "CreateOpenshiftBMCluster1",
+            "X": 342.5,
+            "Y": 234
+          },
+          {
+            "Name": "InvokeGenericWebApi1",
+            "X": 342.5002034836308,
+            "Y": 323
+          },
+          {
+            "Name": "GetMACAddress1",
+            "X": -46.49998786450223,
+            "Y": 432
+          },
+          {
+            "Name": "createVmediaPolicyAndAttachToServerProfiles1",
+            "X": 342.5002034836308,
+            "Y": 426
+          },
+          {
+            "Name": "parallelLoop2",
+            "X": 707.5000000000001,
+            "Y": 225.83333333333337
+          },
+          {
+            "Name": "BootServerfromvMedia1",
+            "X": 717.5000000000001,
+            "Y": 316.83333333333337
+          },
+          {
+            "Name": "InstallOpenShiftCluster1",
+            "X": 717.499734295924,
+            "Y": 428
+          }
+        ]
+      },
+      "VariableDefinition": [
+        {
+          "Default": {
+            "ObjectType": "workflow.DefaultValue",
+            "Value": "api.openshift.com"
+          },
+          "Description": "Relative URL for Intersight, Device Registration and Target APIs. Does not support specifying fully qualified URL.\n",
+          "DisplayMeta": {
+            "InventorySelector": true,
+            "ObjectType": "workflow.DisplayMeta",
+            "WidgetType": "None"
+          },
+          "Label": "openshift_api",
+          "Name": "openshift_api",
+          "ObjectType": "workflow.PrimitiveDataType",
+          "Properties": {
+            "Constraints": {
+              "EnumList": [],
+              "ObjectType": "workflow.Constraints"
+            },
+            "InventorySelector": [],
+            "ObjectType": "workflow.PrimitiveDataProperty",
+            "Type": "string"
+          },
+          "Required": true
+        },
+        {
+          "Name": "ISO_HOST",
+          "Properties": [
+            {
+              "ObjectType": "workflow.TargetProperty",
+              "DisplayAttributes": [
+                "Name",
+                "TargetType"
+              ],
+              "Selector": "/api/v1/asset/Targets?$filter=((TargetType eq HTTPEndpoint and Status eq Claimed) or ((TargetType eq PureStorageFlashArray or TargetType eq HitachiVirtualStoragePlatform or TargetType eq NetAppActiveIqUnifiedManager or TargetType eq TerraformCloud or TargetType eq VmwareVcenter or TargetType eq APIC or TargetType eq MDSDevice or TargetType eq NexusDevice or TargetType eq UCSD or TargetType eq RedfishServer or TargetType eq UCSC890) and Status eq Connected))",
+              "SelectorProperty": {
+                "ObjectType": "workflow.SelectorProperty",
+                "Body": null,
+                "Method": "GET"
+              },
+              "ConnectorAttribute": "",
+              "SupportedObjects": [
+                "asset.Target"
+              ],
+              "ConstraintAttributes": []
+            }
+          ],
+          "InitialMapping": "",
+          "Label": "ISO_HOST",
+          "ObjectType": "workflow.TargetDataType",
+          "Default": {
+            "Override": false,
+            "Value": {
+              "Moid": "6262b5966f72612d31318775",
+              "ObjectType": "asset.Target"
+            }
+          },
+          "Description": "The API call can be made to Intersight or an external endpoint added as Target. Target should be in claimed or connected state. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked. An empty value for this input indicates that the API call is made to Intersight.\n",
+          "DisplayMeta": {
+            "ObjectType": "workflow.DisplayMeta",
+            "InventorySelector": true,
+            "WidgetType": "None"
+          },
+          "InputParameters": null,
+          "Required": false,
+          "CustomDataTypeProperties": {
+            "ObjectType": "workflow.CustomDataProperty",
+            "CatalogMoid": "",
+            "CustomDataTypeId": "",
+            "CustomDataTypeName": ""
+          },
+          "IsArray": false,
+          "Max": 0,
+          "Min": 0,
+          "dirty": true
+        }
+      ],
+      "Version": 2
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/WorkflowDefinitions",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "Batch": [
+        {
+          "Body": "grant_type=refresh_token&refresh_token={{.global.task.input.OFFLINE_TOKEN}}&client_id=cloud-services",
+          "ContentType": "json",
+          "Description": "Get's the Java Web Token from Red Hat",
+          "EndpointRequestType": "Internal",
+          "Headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          "Label": "Get JWT",
+          "Method": "POST",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "Protocol": "https",
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "ACCESS_TOKEN",
+                "ObjectType": "content.Parameter",
+                "Path": "$.access_token",
+                "Secure": false,
+                "Type": "string"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Endpoint",
+          "Url": "/auth/realms/redhat-external/protocol/openid-connect/token"
+        }
+      ],
+      "CancelAction": [],
+      "ClassId": "workflow.BatchApiExecutor",
+      "Constraints": {
+        "ObjectType": "workflow.TaskConstraints"
+      },
+      "Description": "Get's a JWT from Red Hat which you can use for 15 minutes",
+      "Name": "Get Red Hat JWT",
+      "ObjectType": "workflow.BatchApiExecutor",
+      "Output": {
+        "ACCESS_TOKEN": "{{.global.InvokeGenericWebApi1.output.ACCESS_TOKEN}}",
+        "JWT": "{{.global.InvokeGenericWebApi1.output.ACCESS_TOKEN}}",
+        "JWT_TOKEN": "{{.global.InvokeGenericWebApi1.output.ACCESS_TOKEN}}"
+      },
+      "SharedScope": "user",
+      "TaskDefinition": {
+        "ObjectType": "workflow.TaskDefinition",
+        "Selector": "Name eq \"GetRedHatJWT\" and Version eq 1"
+      }
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/BatchApiExecutors",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "Batch": [
+        {
+          "ContentType": "json",
+          "Description": "Get DeviceMoId",
+          "EndpointRequestType": "Internal",
+          "Label": "Get DeviceMoId",
+          "Method": "GET",
+          "Name": "getDeviceMoid",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "DeviceMoId",
+                "ObjectType": "content.Parameter",
+                "Path": "$.DeviceMoId",
+                "Secure": false,
+                "Type": "string"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/compute/PhysicalSummaries/{{ .global.task.input.Server.Moid }}"
+        },
+        {
+          "ContentType": "json",
+          "Description": "Get Server Profile from Server",
+          "EndpointRequestType": "Internal",
+          "Label": "Get Server Profile from Server",
+          "Method": "GET",
+          "Name": "getServerProfilefromServer",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "ServerProfileMoids",
+                "ObjectType": "content.Parameter",
+                "Path": "$.Results[*].ServerProfile.Moid",
+                "Secure": false,
+                "Type": "string"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/view/Servers?$filter=DeviceMoId eq '{{ .global.getDeviceMoid.output.DeviceMoId }}'"
+        }
+      ],
+      "CancelAction": [],
+      "ClassId": "workflow.BatchApiExecutor",
+      "Constraints": {
+        "ObjectType": "workflow.TaskConstraints"
+      },
+      "Description": "Get the Profile which is associated with the server",
+      "Name": "Get Server Profile from Server",
+      "ObjectType": "workflow.BatchApiExecutor",
+      "Output": {
+        "ServerProfileMoids": "{{.global.getServerProfilefromServer.output.ServerProfileMoids}}"
+      },
+      "SharedScope": "user",
+      "TaskDefinition": {
+        "ObjectType": "workflow.TaskDefinition",
+        "Selector": "Name eq \"GetServerProfilefromServer\" and Version eq 1"
+      }
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/BatchApiExecutors",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "Batch": [
+        {
+          "Body": "{\n  \"Name\": \"{{ .global.task.input.Name }}\",\n  \"Enabled\": true,\n  \"Encryption\": true,\n  \"LowPowerUsb\": true,\n  \"Mappings\": [\n      {\n          \"VolumeName\": \"{{ .global.task.input.VolumeName }}\",\n          \"DeviceType\": \"cdd\",\n          \"MountProtocol\": \"{{ .global.task.input.Protocol }}\",\n          \"FileLocation\": \"{{ .global.task.input.URL }}\"\n      }\n  ]\n}",
+          "ContentType": "json",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "EndpointRequestType": "Internal",
+          "Label": "Create Virtual Media Policy",
+          "Method": "POST",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "Moid",
+                "ObjectType": "content.Parameter",
+                "Path": "$.Moid",
+                "Secure": false,
+                "Type": "string"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/vmedia/Policies"
+        }
+      ],
+      "CancelAction": [],
+      "ClassId": "workflow.BatchApiExecutor",
+      "Constraints": {
+        "ObjectType": "workflow.TaskConstraints"
+      },
+      "Description": "Create a Virtual Media Policy that will mount an HTTP(s) URL on the CIMC",
+      "Name": "Create HTTP Virtual Media Policy",
+      "ObjectType": "workflow.BatchApiExecutor",
+      "Output": {
+        "Moid": "{{.global.InvokeGenericWebApi1.output.Moid}}"
+      },
+      "SharedScope": "user",
+      "TaskDefinition": {
+        "ObjectType": "workflow.TaskDefinition",
+        "Selector": "Name eq \"CreateHTTPVirtualMediaPolicy\" and Version eq 1"
+      }
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/BatchApiExecutors",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "Batch": [
+        {
+          "ContentType": "json",
+          "Description": "This will get all Server Profiles",
+          "EndpointRequestType": "Internal",
+          "Label": "Get all Server Profiles",
+          "Method": "GET",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "Protocol": "https",
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "ServerProfileMoids",
+                "ObjectType": "content.Parameter",
+                "Path": "$.Results[*].Moid",
+                "Secure": false,
+                "Type": "json"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/server/Profiles?$filter=SrcTemplate.Moid eq '{{ .global.task.input.SPT.Moid }}'&$inlinecount=allpages&$top=1000"
+        }
+      ],
+      "CancelAction": [],
+      "ClassId": "workflow.BatchApiExecutor",
+      "Constraints": {
+        "ObjectType": "workflow.TaskConstraints"
+      },
+      "Description": "Get Profiles attached to a Template",
+      "Name": "Get Server Profiles attached to Template",
+      "ObjectType": "workflow.BatchApiExecutor",
+      "Output": {
+        "ServerProfileMoids": "{{.global.InvokeGenericWebApi1.output.ServerProfileMoids}}"
+      },
+      "SharedScope": "user",
+      "TaskDefinition": {
+        "ObjectType": "workflow.TaskDefinition",
+        "Selector": "Name eq \"GetServerProfilesattachedtoTemplate\" and Version eq 1"
+      }
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/BatchApiExecutors",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "Batch": [
+        {
+          "Body": "{ \"SrcTemplate\" : null }",
+          "ContentType": "json",
+          "Description": "Server Profile needs to be detached from Template in order to add a Policy",
+          "EndpointRequestType": "Internal",
+          "Label": "Detach Server Profile",
+          "Method": "PATCH",
+          "Name": "InvokeGenericWebApi3",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/server/Profiles/{{ .global.task.input.SP }}"
+        },
+        {
+          "Body": "[\n  {\n    \"Moid\": \"{{ .global.task.input.PolicyMoId }}\",\n    \"ObjectType\": \"{{ .global.task.input.PolicyType }}\"\n  }\n]\n",
+          "ContentType": "json",
+          "Description": "Add Policy to Server Profile ",
+          "EndpointRequestType": "Internal",
+          "Label": "Add Policy to Server Profile ",
+          "Method": "POST",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "RESPONSE",
+                "ObjectType": "content.Parameter",
+                "Path": "$",
+                "Secure": false,
+                "Type": "json"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/server/Profiles/{{ .global.task.input.SP }}/PolicyBucket"
+        }
+      ],
+      "CancelAction": [],
+      "ClassId": "workflow.BatchApiExecutor",
+      "Constraints": {
+        "ObjectType": "workflow.TaskConstraints"
+      },
+      "Description": "This task will add your Policy to a Server Profile Template Policy Bucket and will do it for all the attached profiles",
+      "Name": "Add Policy to Server Profile",
+      "ObjectType": "workflow.BatchApiExecutor",
+      "Output": {},
+      "SharedScope": "user",
+      "TaskDefinition": {
+        "ObjectType": "workflow.TaskDefinition",
+        "Selector": "Name eq \"AddPolicytoServerProfile\" and Version eq 1"
+      }
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/BatchApiExecutors",
+    "Verb": "POST"
+  },
+  {
+    "Body": {
+      "Batch": [
+        {
+          "ContentType": "json",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "EndpointRequestType": "Internal",
+          "Label": "Get Server Device MOID",
+          "Method": "GET",
+          "Name": "InvokeGenericWebApi2",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "DeviceMoId",
+                "ObjectType": "content.Parameter",
+                "Path": "$.Results[*].DeviceMoId",
+                "Secure": false,
+                "Type": "json"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/compute/PhysicalSummaries?$filter=\n{{- range $index, $server := .global.task.input.SERVERS -}}\n{{if $index }} OR {{end -}}\nMoid eq '{{$server.Moid}}' {{- end}}"
+        },
+        {
+          "ContentType": "json",
+          "Description": "Get Adapter Moid",
+          "EndpointRequestType": "Internal",
+          "Label": "Get Adapter",
+          "Method": "GET",
+          "Name": "InvokeGenericWebApi3",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "AdapterUnit",
+                "ObjectType": "content.Parameter",
+                "Path": "$.Results[*].Moid",
+                "Secure": false,
+                "Type": "string"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/adapter/Units?$filter=AdapterId eq '{{.global.task.input.AdapterID}}' AND DeviceMoId in ({{ range $index, $server := .global.InvokeGenericWebApi2.output.DeviceMoId -}}{{- if $index}},{{end -}}'{{$server}}'{{- end}})"
+        },
+        {
+          "ContentType": "json",
+          "Description": "Invokes the given Web API against the given endpoint. The endpoint can be Intersight API or an external endpoint added as Target in Intersight. Please refer Supported Endpoints section in the Web API request end user documentation for the list of Intersight Targets on which Web API task can be invoked.\n",
+          "EndpointRequestType": "Internal",
+          "Label": "Get MAC Address",
+          "Method": "GET",
+          "Name": "InvokeGenericWebApi1",
+          "ObjectType": "workflow.WebApi",
+          "Outcomes": [],
+          "ResponseSpec": {
+            "ErrorParameters": [],
+            "ObjectType": "content.Grammar",
+            "Parameters": [
+              {
+                "AcceptSingleValue": false,
+                "ComplexType": "",
+                "ItemType": "simple",
+                "Name": "MAC_ADDRESS",
+                "ObjectType": "content.Parameter",
+                "Path": "$.Results[*].MacAddress",
+                "Secure": false,
+                "Type": "string"
+              }
+            ],
+            "Types": []
+          },
+          "TargetType": "Local",
+          "Url": "/api/v1/adapter/HostEthInterfaces?$filter=Name eq '{{.global.task.input.NIC_NAME}}' AND AdapterUnit.Moid in ({{ range $index, $adapter := .global.InvokeGenericWebApi3.output.AdapterUnit -}}{{- if $index}},{{end -}}'{{$adapter}}'{{- end}})"
+        }
+      ],
+      "CancelAction": [],
+      "ClassId": "workflow.BatchApiExecutor",
+      "Constraints": {
+        "ObjectType": "workflow.TaskConstraints"
+      },
+      "Description": "Get the MAC address for one or multiple servers for a specific NIC",
+      "Name": "Get MAC Address",
+      "ObjectType": "workflow.BatchApiExecutor",
+      "Output": {
+        "MAC_ADDRESS": "{{.global.InvokeGenericWebApi1.output.MAC_ADDRESS}}"
+      },
+      "SharedScope": "user",
+      "TaskDefinition": {
+        "ObjectType": "workflow.TaskDefinition",
+        "Selector": "Name eq \"GetMACAddress\" and Version eq 1"
+      }
+    },
+    "ClassId": "bulk.RestSubRequest",
+    "ObjectType": "bulk.RestSubRequest",
+    "TargetMoid": "",
+    "Uri": "/v1/workflow/BatchApiExecutors",
+    "Verb": "POST"
+  }
+]

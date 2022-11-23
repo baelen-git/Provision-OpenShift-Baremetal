@@ -14,21 +14,17 @@ This repository will hold everything you need to setup the Intersight workflow t
 # Steps
 1. Create your Policies and Profiles.<br>
 Please following the instuctions in [the example directory](examples/README.MD) to load the provided example.
-2. Import the workflow
-3. Login to your Linux server and run the docker container
+2. Login to your Linux server and run the docker container
 ``` 
 docker run -d -p 80:80 baelen/iso-host
 ```
-4. Claim the ISO Host in Intersight as a HTTP target
+3. Claim the ISO Host in Intersight as a HTTP target
+4. Import the workflow. After importing the workflow should show as invalid.
 5. Modify the workflow to use the ISO Host target. <br>
-Open the workflow and go to Designer -> Download Discovery ISO.
-    1. Go to Inputs and under "External Targets" click on Edit Mapping 
-    2. Under External Target click on "Select External Target" and select your ISO_HOST target.
-6. Map the Server Worklow Input to the Get Mac Address Task (somehow this doesnt stay mapped during import/export). <br>
-Open the workflow and go to Designer -> Get MAC Address.
-    1. Go to Inputs and under "Servers" click on Edit Mapping 
-    2. Select Direct Mapping -> Workflow Input -> Servers
-    3. leave Array Index empty
+Open the workflow and go to General -> Workflow Variables.
+    1. Behind ISO_HOST click on View Value. 
+    2. Click on Select ISO_HOST and select your ISO_HOST target.
+    3. Hit Close and then Save. Your workflow should now be valid. 
 7. Execute the workflow.
     
 # Validated Setup
