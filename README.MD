@@ -29,9 +29,10 @@ Under Targets click on Claim
 4. Import the workflow. After importing the workflow should show as invalid.
 5. Modify the workflow to use the ISO Host target. <br>
 Open the workflow and go to General -> Workflow Variables.
-    1. Behind ISO_HOST click on View Value. 
-    2. Click on Select ISO_HOST and select your ISO_HOST target.
-    3. Hit Close and then Save. Your workflow should now be valid. 
+    1. Behind ISO_HOST click on Pen icon to edit the variable. 
+    2. Under "Default Value" click on "Select Default Value"
+    3. Select your ISO_HOST click on select and then save.
+    3. Hit Save again. Your workflow should now be valid. 
 7. Execute the workflow.
     
 # Validated Setup
