@@ -1,6 +1,5 @@
 Todo:
 - Fix bonding
-- Fix the missing SERVER mapping for get MAC task on import
 - Add validation to see if you have provided enough IPS for the MAC list
 - automatically get the NIC and Adapter names from the SPT. 
 - Proxy Support
@@ -14,6 +13,7 @@ Todo:
 - Configure the Uplink switch correctly.
 
 DONE
+- Fix the missing SERVER mapping for get MAC task on import
 - Accomodate for longer waits then 15 minutes in the install workflow 
 - Support Virtualization and Data Foundation options
 - Provide an example SPT through isctl
